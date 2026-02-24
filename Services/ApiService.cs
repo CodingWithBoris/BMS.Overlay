@@ -8,7 +8,7 @@ namespace BMS.Overlay.Services;
 public class ApiService
 {
     private readonly HttpClient _httpClient;
-    private const string BaseUrl = "https://your-railway-app.railway.app/api/v1";
+    private const string BaseUrl = "http://bms-production-2d4a.up.railway.app:8080/api/v1";
     private bool _isOfflineMode = false;
 
     public ApiService()

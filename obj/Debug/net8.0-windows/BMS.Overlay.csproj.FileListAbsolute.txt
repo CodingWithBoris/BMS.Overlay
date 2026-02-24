@@ -27,3 +27,4 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\refint\BMS.Over
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.pdb
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.genruntimeconfig.cache
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\ref\BMS.Overlay.dll
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.sourcelink.json
