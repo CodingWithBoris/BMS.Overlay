@@ -5,20 +5,55 @@ using BMS.Shared.Models;
 
 namespace BMS.Overlay.Services;
 
+// Local DTOs for API responses (mirrors BMS.API.Models.DTOs)
+internal class ApiResponse<T> where T : class
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public T? Data { get; set; }
+}
+
+internal class FactionDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string OwnerId { get; set; } = string.Empty;
+    public List<RoleDto> Roles { get; set; } = new();
+    public DateTime CreatedAt { get; set; }
+}
+
+internal class RoleDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public bool IsDefault { get; set; }
+}
+
 public class ApiService
 {
     private readonly HttpClient _httpClient;
-    private const string BaseUrl = "http://bms-production-2d4a.up.railway.app:8080/api/v1";
+    private string _baseUrl;
     private bool _isOfflineMode = false;
 
-    public ApiService()
+    public ApiService(string? baseUrl = null)
     {
+        // Allow override via constructor, otherwise use defaults
+        // For local development: http://localhost:8080/api/v1
+        // For production: https://bms-production-f22e.up.railway.app/api/v1/
+        _baseUrl = baseUrl ?? "http://localhost:8080/api/v1";
+        
         var handler = new HttpClientHandler();
         _httpClient = new HttpClient(handler)
         {
-            BaseAddress = new Uri(BaseUrl),
+            BaseAddress = new Uri(_baseUrl),
             Timeout = TimeSpan.FromSeconds(15)
         };
+    }
+
+    public void SetBaseUrl(string baseUrl)
+    {
+        _baseUrl = baseUrl;
+        _httpClient.BaseAddress = new Uri(_baseUrl);
     }
 
     public void SetAuthToken(string jwtToken)
@@ -31,7 +66,7 @@ public class ApiService
     {
         try
         {
-            var response = await _httpClient.GetAsync($"/factions/{factionId}/orders");
+            var response = await _httpClient.GetAsync($"factions/{factionId}/orders");
             
             if (!response.IsSuccessStatusCode)
             {
@@ -62,7 +97,7 @@ public class ApiService
     {
         try
         {
-            var response = await _httpClient.GetAsync($"/factions/{factionId}/orders/{index}");
+            var response = await _httpClient.GetAsync($"factions/{factionId}/orders/{index}");
             
             if (!response.IsSuccessStatusCode)
                 return null;
@@ -82,19 +117,45 @@ public class ApiService
     {
         try
         {
-            var response = await _httpClient.GetAsync("/factions");
+            System.Diagnostics.Debug.WriteLine($"Fetching factions from: {_httpClient.BaseAddress}factions");
+            var response = await _httpClient.GetAsync("factions");
+            var json = await response.Content.ReadAsStringAsync();
             
+            System.Diagnostics.Debug.WriteLine($"Faction response [{response.StatusCode}]: {json[..Math.Min(json.Length, 200)]}");
+
             if (!response.IsSuccessStatusCode)
             {
-                System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode}");
+                System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {response.ReasonPhrase}");
                 _isOfflineMode = true;
                 return GetMockFactions();
             }
 
-            _isOfflineMode = false;
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<FactionInfo>>(json, 
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+            // Parse the ApiResponse wrapper
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<FactionDto>>>(json, 
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (apiResponse?.Success == true && apiResponse.Data != null)
+            {
+                _isOfflineMode = false;
+                // Convert FactionDto to FactionInfo
+                return apiResponse.Data.Select(f => new FactionInfo
+                {
+                    Id = f.Id,
+                    Title = f.Title,
+                    OwnerId = f.OwnerId,
+                    CreatedAt = f.CreatedAt,
+                    Roles = f.Roles?.Select(r => new RoleInfo
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        IsDefault = r.IsDefault
+                    }).ToList() ?? new()
+                }).ToList();
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Failed to parse faction response: Success={apiResponse?.Success}");
+            _isOfflineMode = true;
+            return GetMockFactions();
         }
         catch (HttpRequestException ex)
         {
@@ -102,9 +163,15 @@ public class ApiService
             _isOfflineMode = true;
             return GetMockFactions();
         }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"JSON Parse Error: {ex.Message}");
+            _isOfflineMode = true;
+            return GetMockFactions();
+        }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"API Error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"API Error: {ex.Message}\n{ex.StackTrace}");
             return new();
         }
     }
@@ -119,7 +186,7 @@ public class ApiService
                 System.Text.Encoding.UTF8,
                 "application/json");
             
-            var response = await _httpClient.PostAsync($"/factions/{factionId}/verify-view", content);
+            var response = await _httpClient.PostAsync($"factions/{factionId}/verify-view", content);
             
             if (_isOfflineMode)
                 return !string.IsNullOrEmpty(password); // Mock validation for offline mode

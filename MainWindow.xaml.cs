@@ -19,7 +19,8 @@ namespace BMS.Overlay
         {
             InitializeComponent();
 
-            _apiService = new ApiService();
+            // Use production endpoint for testing
+            _apiService = new ApiService("https://bms-production-f22e.up.railway.app/api/v1");
             _settingsService = new SettingsService();
             
             // Set window properties
