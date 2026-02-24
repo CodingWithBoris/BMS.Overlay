@@ -27,7 +27,7 @@ public class ApiService
             new AuthenticationHeaderValue("Bearer", jwtToken);
     }
 
-    public async Task<List<BmsOrder>> GetOrdersAsync(Guid factionId)
+    public async Task<List<BmsOrder>> GetOrdersAsync(string factionId)
     {
         try
         {
@@ -58,7 +58,7 @@ public class ApiService
         }
     }
 
-    public async Task<BmsOrder?> GetOrderByIndexAsync(Guid factionId, int index)
+    public async Task<BmsOrder?> GetOrderByIndexAsync(string factionId, int index)
     {
         try
         {
@@ -109,7 +109,7 @@ public class ApiService
         }
     }
 
-    public async Task<bool> VerifyFactionPasswordAsync(Guid factionId, string password)
+    public async Task<bool> VerifyFactionPasswordAsync(string factionId, string password)
     {
         try
         {
@@ -142,25 +142,25 @@ public class ApiService
         {
             new FactionInfo
             {
-                Id = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                Id = "550e8400-e29b-41d4-a716-446655440000",
                 Title = "Command",
-                OwnerId = Guid.NewGuid(),
+                OwnerId = Guid.NewGuid().ToString(),
                 CreatedAt = DateTime.UtcNow,
                 Roles = new List<RoleInfo>
                 {
-                    new RoleInfo { Id = Guid.NewGuid(), Name = "Officer", IsDefault = true },
-                    new RoleInfo { Id = Guid.NewGuid(), Name = "Scout", IsDefault = false }
+                    new RoleInfo { Id = Guid.NewGuid().ToString(), Name = "Officer", IsDefault = true },
+                    new RoleInfo { Id = Guid.NewGuid().ToString(), Name = "Scout", IsDefault = false }
                 }
             },
             new FactionInfo
             {
-                Id = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                Id = "550e8400-e29b-41d4-a716-446655440001",
                 Title = "Support",
-                OwnerId = Guid.NewGuid(),
+                OwnerId = Guid.NewGuid().ToString(),
                 CreatedAt = DateTime.UtcNow,
                 Roles = new List<RoleInfo>
                 {
-                    new RoleInfo { Id = Guid.NewGuid(), Name = "Support", IsDefault = true }
+                    new RoleInfo { Id = Guid.NewGuid().ToString(), Name = "Support", IsDefault = true }
                 }
             }
         };
@@ -172,8 +172,8 @@ public class ApiService
         {
             new BmsOrder
             {
-                Id = Guid.NewGuid(),
-                FactionId = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
+                FactionId = Guid.NewGuid().ToString(),
                 OrderIndex = 0,
                 Title = "Operation Briefing",
                 Content = "Welcome to the BMS System.\n\nThis is a mock order for demonstration purposes.\n\n• Objective: Test overlay functionality\n• Timeline: Ongoing\n• Status: Active",
@@ -183,8 +183,8 @@ public class ApiService
             },
             new BmsOrder
             {
-                Id = Guid.NewGuid(),
-                FactionId = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
+                FactionId = Guid.NewGuid().ToString(),
                 OrderIndex = 1,
                 Title = "Additional Information",
                 Content = "This is another mock order.\n\nFeatures:\n• Bold text support\n• Lists\n• Multiple pages\n• Real-time updates\n\nUse the arrow buttons to navigate between orders.",

@@ -17,8 +17,8 @@ namespace BMS.Overlay.ViewModels
         private int _currentOrderIndex = 0;
         private string _currentTab = "BMS";
         private BmsOrder? _currentOrder;
-        private Guid? _selectedFactionId;
-        private Guid? _selectedRoleId;
+        private string? _selectedFactionId;
+        private string? _selectedRoleId;
         private string _defaultMessage = "Welcome to BMS Overlay\n\nNo faction selected. Please select a faction from the BMS Options tab.";
 
         public ObservableCollection<FactionInfo> Factions { get; } = new();
@@ -70,7 +70,7 @@ namespace BMS.Overlay.ViewModels
             }
         }
 
-        public Guid? SelectedFactionId
+        public string? SelectedFactionId
         {
             get => _selectedFactionId;
             set
@@ -83,7 +83,7 @@ namespace BMS.Overlay.ViewModels
             }
         }
 
-        public Guid? SelectedRoleId
+        public string? SelectedRoleId
         {
             get => _selectedRoleId;
             set
@@ -132,7 +132,7 @@ namespace BMS.Overlay.ViewModels
         {
             try
             {
-                if (SelectedFactionId == null || SelectedFactionId == Guid.Empty)
+                if (string.IsNullOrEmpty(SelectedFactionId))
                 {
                     _orders.Clear();
                     Orders.Clear();
@@ -140,7 +140,7 @@ namespace BMS.Overlay.ViewModels
                     return;
                 }
 
-                _orders = await _apiService.GetOrdersAsync(SelectedFactionId.Value);
+                _orders = await _apiService.GetOrdersAsync(SelectedFactionId);
                 Orders.Clear();
                 foreach (var order in _orders.OrderBy(o => o.OrderIndex))
                 {
