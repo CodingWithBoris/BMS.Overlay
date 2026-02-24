@@ -1,0 +1,42 @@
+<Page x:Class="BMS.Overlay.Views.BmsTabView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="BMS Orders" Background="#0F3460" Foreground="White"
+      Loaded="Page_Loaded">
+    <Grid>
+        <!-- Order Display -->
+        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Stretch">
+            <!-- Order Title -->
+            <TextBlock x:Name="OrderTitle" 
+                       FontSize="16" FontWeight="Bold" Foreground="#FFD700"
+                       Text="{Binding CurrentOrder.Title, FallbackValue='Untitled Order'}"
+                       Margin="0,0,0,10"/>
+
+            <!-- Order Index Counter -->
+            <TextBlock FontSize="12" Foreground="#AAAAAA"
+                       Margin="0,0,0,10">
+                <Run Text="Order "/>
+                <Run Text="{Binding CurrentOrderIndex, Mode=OneWay}"/>
+                <Run Text=" of "/>
+                <Run Text="{Binding TotalOrders, Mode=OneWay}"/>
+            </TextBlock>
+
+            <!-- Order Content -->
+            <Border BorderBrush="#555" BorderThickness="1" Padding="10" CornerRadius="4" Background="#0A2540">
+                <TextBlock x:Name="OrderContent"
+                           FontSize="12" Foreground="White"
+                           Text="{Binding CurrentOrder.Content, FallbackValue='Select a faction from BMS Options to view orders'}"
+                           TextWrapping="Wrap"
+                           Padding="10"/>
+            </Border>
+
+            <!-- No Orders Message -->
+            <StackPanel x:Name="NoOrdersPanel" VerticalAlignment="Center" Margin="20">
+                <TextBlock Text="No Orders Available" FontSize="14" FontWeight="Bold" 
+                           Foreground="White" TextAlignment="Center" Margin="0,0,0,10"/>
+                <TextBlock Text="Select a faction from the BMS Options tab to view published orders."
+                           FontSize="11" Foreground="#CCCCCC" TextWrapping="Wrap" TextAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

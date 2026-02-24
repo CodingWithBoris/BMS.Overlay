@@ -1,0 +1,45 @@
+<Window x:Class="BMS.Overlay.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent" Topmost="True"
+        ShowInTaskbar="False" ResizeMode="NoResize"
+        Left="0" Top="0" Width="280"
+        Title="BMS Overlay"
+        Closing="Window_Closing">
+    <Grid Background="#CC1A1A2E">
+        <!-- Main Panel (visible when not minimized) -->
+        <Border x:Name="MainPanel" Background="#CC1A1A2E" CornerRadius="0,8,8,0"
+                Visibility="Visible">
+            <DockPanel>
+                <!-- Tab Bar -->
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5,5,5,0">
+                    <Button x:Name="BmsTabButton" Content="BMS" Width="130" Margin="0,0,5,0"
+                            Click="OnBmsTab_Click" Background="#0F3460" Foreground="White" FontWeight="Bold"/>
+                    <Button x:Name="OptionsTabButton" Content="BMS Options" Width="130"
+                            Click="OnOptionsTab_Click" Background="#0F3460" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
+                
+                <!-- Bottom Nav -->
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                            Margin="5,0,5,5" Height="35">
+                    <Button x:Name="PrevButton" Content="&lt;" Width="85" Click="OnPrev_Click"
+                            Background="#E94560" Foreground="White" FontWeight="Bold"/>
+                    <Button x:Name="MinimizeButton" Content="-" Width="85" Margin="5,0"
+                            Click="OnMinimize_Click" Background="#E94560" Foreground="White" FontWeight="Bold"/>
+                    <Button x:Name="NextButton" Content="&gt;" Width="85" Click="OnNext_Click"
+                            Background="#E94560" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
+                
+                <!-- Content -->
+                <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Background="#0F3460"/>
+            </DockPanel>
+        </Border>
+        
+        <!-- Minimized Bar -->
+        <Button x:Name="RestoreBar" Content="+"
+                VerticalAlignment="Bottom" Height="30" Width="280"
+                Visibility="Collapsed"
+                Click="OnRestore_Click" Background="#E94560" Foreground="White" FontWeight="Bold" FontSize="16"/>
+    </Grid>
+</Window>
