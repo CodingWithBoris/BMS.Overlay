@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BMS.Overlay")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e24bc95a2dc1d85082dc319e821f3c2531587df0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bda4f32657e32f04de87de2c9f22bc265e632eb8")]
 [assembly: System.Reflection.AssemblyProductAttribute("BMS.Overlay")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BMS.Overlay")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

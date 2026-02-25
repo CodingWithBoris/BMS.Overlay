@@ -21,11 +21,14 @@ namespace BMS.Overlay.ViewModels
         private BmsOrder? _currentOrder;
         private string? _selectedFactionId;
         private string? _selectedRoleId;
+        private bool _isPopulatingRoles = false;
         private string _defaultMessage = "Welcome to BMS Overlay\n\nNo faction selected. Please select a faction from the BMS Options tab.";
 
         public ObservableCollection<FactionInfo> Factions { get; } = new();
         public ObservableCollection<BmsOrder> Orders { get; } = new();
         public ObservableCollection<RoleInfo> Roles { get; } = new();
+        public string CurrentVoterId => _apiService.VoterId;
+        public HashSet<string> AuthenticatedFactionIds { get; } = new();
 
         public MainViewModel(ApiService apiService, SettingsService settingsService, SignalRService? signalRService = null)
         {
@@ -129,8 +132,9 @@ namespace BMS.Overlay.ViewModels
                 {
                     _selectedRoleId = value;
                     OnPropertyChanged();
-                    // Re-filter orders when role changes
-                    FilterOrdersByRole();
+                    // Re-filter orders when role changes (but not during role population)
+                    if (!_isPopulatingRoles)
+                        FilterOrdersByRole();
                 }
             }
         }
@@ -220,11 +224,22 @@ namespace BMS.Overlay.ViewModels
 
         public async Task SelectFactionAsync(FactionInfo faction)
         {
+            System.Diagnostics.Debug.WriteLine($"SelectFactionAsync called: {faction.Title} (ID: {faction.Id})");
+            System.Diagnostics.Debug.WriteLine($"  Faction has {faction.Roles?.Count ?? 0} roles");
+            if (faction.Roles != null)
+            {
+                foreach (var r in faction.Roles)
+                {
+                    System.Diagnostics.Debug.WriteLine($"    Role: {r.Name} (ID: {r.Id})");
+                }
+            }
+
             SelectedFactionId = faction.Id;
+            AuthenticatedFactionIds.Add(faction.Id);
 
             // Populate roles for the selected faction
+            _isPopulatingRoles = true;
             Roles.Clear();
-            Roles.Add(new RoleInfo { Id = "__all__", Name = "All Roles", IsDefault = false });
             if (faction.Roles != null)
             {
                 foreach (var role in faction.Roles)
@@ -232,7 +247,10 @@ namespace BMS.Overlay.ViewModels
                     Roles.Add(role);
                 }
             }
-            SelectedRoleId = "__all__";
+            System.Diagnostics.Debug.WriteLine($"  Roles collection now has {Roles.Count} items");
+            var defaultRole = Roles.FirstOrDefault(r => r.IsDefault) ?? Roles.FirstOrDefault();
+            SelectedRoleId = defaultRole?.Id;
+            _isPopulatingRoles = false;
             OnPropertyChanged(nameof(Roles));
             await LoadOrdersAsync();
 
@@ -255,6 +273,20 @@ namespace BMS.Overlay.ViewModels
             CurrentOrderIndex = CurrentOrderIndex == 0 ? _orders.Count - 1 : CurrentOrderIndex - 1;
         }
 
+        public async Task VotePollAsync(string orderId, string sectionId, string optionId)
+        {
+            if (string.IsNullOrEmpty(SelectedFactionId)) return;
+            await _apiService.VotePollAsync(SelectedFactionId, orderId, sectionId, optionId);
+            // SignalR will trigger a refresh via OrdersUpdated event
+        }
+
+        public async Task ToggleChecklistAsync(string orderId, string sectionId, string itemId)
+        {
+            if (string.IsNullOrEmpty(SelectedFactionId)) return;
+            await _apiService.ToggleChecklistAsync(SelectedFactionId, orderId, sectionId, itemId);
+            // SignalR will trigger a refresh via OrdersUpdated event
+        }
+
         private void UpdateCurrentOrder()
         {
             if (_orders.Count > 0 && CurrentOrderIndex >= 0 && CurrentOrderIndex < _orders.Count)
@@ -264,6 +296,52 @@ namespace BMS.Overlay.ViewModels
             else
             {
                 CurrentOrder = null;
+            }
+        }
+
+        // ──────────────────────────────────────────
+        // Settings Access
+        // ──────────────────────────────────────────
+        public Settings GetSettings() => _settingsService.GetSettings();
+
+        public void UpdateToggleKey(string keyName)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.KeyToggleOverlay = keyName;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            // Tell MainWindow to re-register the hook with the new key
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.RegisterToggleKey(keyName);
+            }
+        }
+
+        public void UpdateOverlayWidth(double width)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.OverlayWidth = width;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.Width = width;
+                mainWindow.MaxWidth = width;
+            }
+        }
+
+        public void UpdateJtacMode(bool enabled)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.JtacMode = enabled;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.SetJtacMode(enabled);
             }
         }
     }

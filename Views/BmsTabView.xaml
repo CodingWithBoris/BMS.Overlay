@@ -1,43 +1,90 @@
 <Page x:Class="BMS.Overlay.Views.BmsTabView"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="BMS Orders" Background="#0F3460" Foreground="White"
-      Loaded="Page_Loaded">
-    <Grid>
-        <!-- Order Display -->
-        <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Stretch">
-            <!-- Order Title -->
-            <TextBlock x:Name="OrderTitle" 
-                       FontSize="16" FontWeight="Bold" Foreground="#FFD700"
-                       Text="{Binding CurrentOrder.Title, FallbackValue='Untitled Order'}"
-                       Margin="0,0,0,10"/>
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="BMS Orders" Background="Transparent" Foreground="White"
+    Loaded="Page_Loaded">
+    <Grid Background="Transparent">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Stretch">
+                <!-- Order Title -->
+                <TextBlock x:Name="OrderTitle" 
+                           FontSize="16" FontWeight="Bold" Foreground="#FFD700"
+                           Text="{Binding CurrentOrder.Title, FallbackValue='Welcome to the BMS'}"
+                           Margin="0,0,0,6"/>
 
-            <!-- Order Index Counter -->
-            <TextBlock FontSize="12" Foreground="#AAAAAA"
-                       Margin="0,0,0,10">
-                <Run Text="Order "/>
-                <Run Text="{Binding CurrentOrderIndex, Mode=OneWay}"/>
-                <Run Text=" of "/>
-                <Run Text="{Binding TotalOrders, Mode=OneWay}"/>
-            </TextBlock>
+                <!-- Order Index Counter -->
+                <TextBlock FontSize="12" Foreground="#AAAAAA" Margin="0,0,0,10">
+                    <Run Text="Order "/>
+                    <Run Text="{Binding CurrentOrderIndex, Mode=OneWay}"/>
+                    <Run Text=" of "/>
+                    <Run Text="{Binding TotalOrders, Mode=OneWay}"/>
+                </TextBlock>
 
-            <!-- Order Content (renders FlowDocument XAML) -->
-            <Border BorderBrush="#555" BorderThickness="1" Padding="0" CornerRadius="4" Background="#0A2540">
-                <RichTextBox x:Name="OrderContent"
-                             FontSize="12" Foreground="White" Background="Transparent"
-                             IsReadOnly="True" BorderThickness="0"
-                             IsDocumentEnabled="True"
-                             Padding="10"
-                             VerticalScrollBarVisibility="Auto"/>
-            </Border>
+                <!-- Sections Container (populated in code-behind) -->
+                <StackPanel x:Name="SectionsPanel"/>
 
-            <!-- No Orders Message -->
-            <StackPanel x:Name="NoOrdersPanel" VerticalAlignment="Center" Margin="20">
-                <TextBlock Text="No Orders Available" FontSize="14" FontWeight="Bold" 
-                           Foreground="White" TextAlignment="Center" Margin="0,0,0,10"/>
-                <TextBlock Text="Select a faction from the BMS Options tab to view published orders."
-                           FontSize="11" Foreground="#CCCCCC" TextWrapping="Wrap" TextAlignment="Center"/>
+                <!-- Legacy Content (for orders without sections) -->
+                <Border x:Name="LegacyContentBorder" BorderBrush="#26303A" BorderThickness="1" 
+                    Padding="0" CornerRadius="4" Background="#80000000" Visibility="Collapsed">
+                    <RichTextBox x:Name="OrderContent"
+                                 FontSize="12" Foreground="White" Background="Transparent"
+                                 IsReadOnly="True" BorderThickness="0"
+                                 IsDocumentEnabled="True" Padding="10"
+                                 VerticalScrollBarVisibility="Auto"/>
+                </Border>
+
+                <!-- No Orders Message -->
+                <StackPanel x:Name="NoOrdersPanel" VerticalAlignment="Center" Margin="20">
+                    <TextBlock Text="No Orders Available" FontSize="14" FontWeight="Bold" 
+                               Foreground="White" TextAlignment="Center" Margin="0,0,0,10"/>
+                    <TextBlock Text="Select a faction from the BMS Options tab to view published orders."
+                               FontSize="11" Foreground="#CCCCCC" TextWrapping="Wrap" TextAlignment="Center"/>
+
+                    <TextBlock Text="How To Use BMS Overlay" FontSize="12" FontWeight="Bold"
+                               Foreground="#FFD700" Margin="0,14,0,8" TextAlignment="Center"/>
+
+                    <!-- Default Text Section Example -->
+                        <Border BorderBrush="#26303A" BorderThickness="1" CornerRadius="4" Background="#80000000"
+                            Padding="10" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="1) SELECT A FACTION" Foreground="#FFD700" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text="Open BMS Options, choose your faction, and pick your role. Orders are filtered by your role automatically."
+                                       Foreground="#DDDDDD" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Default Poll Section Example -->
+                        <Border BorderBrush="#26303A" BorderThickness="1" CornerRadius="4" Background="#80000000"
+                            Padding="10" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="2) NAVIGATE ORDERS" Foreground="#FFD700" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text="Use the left and right arrows to cycle through published orders."
+                                       Foreground="#DDDDDD" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,8"/>
+                            <Border Background="#50000000" CornerRadius="3" Height="24" Margin="0,0,0,4">
+                                <TextBlock Text="◀ Previous Order" Foreground="#BBBBBB" FontSize="10"
+                                           VerticalAlignment="Center" Margin="8,0"/>
+                            </Border>
+                            <Border Background="#50000000" CornerRadius="3" Height="24">
+                                <TextBlock Text="▶ Next Order" Foreground="#BBBBBB" FontSize="10"
+                                           VerticalAlignment="Center" Margin="8,0"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Default Checklist Section Example -->
+                        <Border BorderBrush="#26303A" BorderThickness="1" CornerRadius="4" Background="#80000000"
+                            Padding="10">
+                        <StackPanel>
+                            <TextBlock Text="3) INTERACT WITH CONTENT" Foreground="#FFD700" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text="Vote on polls and check checklist items directly in this tab. Changes sync in real time."
+                                       Foreground="#DDDDDD" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,6"/>
+                            <TextBlock Text="• Polls: click one option to vote" Foreground="#CCCCCC" FontSize="11" Margin="0,0,0,2"/>
+                            <TextBlock Text="• Checklists: tick items to mark complete" Foreground="#CCCCCC" FontSize="11" Margin="0,0,0,2"/>
+                            <TextBlock Text="• Use '-' to minimize and '+' to reopen" Foreground="#CCCCCC" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

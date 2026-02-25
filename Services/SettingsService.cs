@@ -62,10 +62,13 @@ public class Settings
 {
     public Guid? SelectedFactionId { get; set; }
     public Guid? SelectedRoleId { get; set; }
+    public string VoterId { get; set; } = string.Empty;
     public string KeyPrevious { get; set; } = "Left";
     public string KeyNext { get; set; } = "Right";
     public string KeyMinimize { get; set; } = "F9";
     public string KeyRestore { get; set; } = "F9";
+    public string KeyToggleOverlay { get; set; } = "M";
     public double OverlayWidth { get; set; } = 280;
     public double OverlayOpacity { get; set; } = 0.8;
+    public bool JtacMode { get; set; } = false;
 }

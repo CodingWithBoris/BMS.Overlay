@@ -1,97 +1,274 @@
 <Page x:Class="BMS.Overlay.Views.BmsOptionsView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="BMS Options" Background="#0F3460" Foreground="White">
+      Title="BMS Options" Background="Transparent" Foreground="White">
     <Page.Resources>
-        <!-- ComboBox style: white background, black text for readability -->
-        <Style x:Key="ReadableComboBox" TargetType="ComboBox">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="BorderBrush" Value="#888"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="8,6"/>
+        <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#80000000"/>
+        <SolidColorBrush x:Key="PanelBorderBrush" Color="#26303A"/>
+        <SolidColorBrush x:Key="HeaderLineBrush" Color="#D8D8D8"/>
+        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#F0F0F0"/>
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#AEB6C2"/>
+        <SolidColorBrush x:Key="GoldTextBrush" Color="#E3C341"/>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
         </Style>
+
+        <Style x:Key="SectionLineStyle" TargetType="Border">
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{StaticResource HeaderLineBrush}"/>
+        </Style>
+
+        <Style x:Key="SettingRowStyle" TargetType="Border">
+            <Setter Property="Background" Value="#80000000"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Padding" Value="12,10"/>
+        </Style>
+
+        <Style x:Key="SettingLabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+
+        <Style x:Key="ReadableComboBox" TargetType="ComboBox">
+            <Setter Property="Background" Value="#50000000"/>
+            <Setter Property="Foreground" Value="#111111"/>
+            <Setter Property="BorderBrush" Value="#2E3A46"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="MinWidth" Value="210"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="#090D14"/>
+                        <Setter Property="Foreground" Value="#DFE4EC"/>
+                        <Setter Property="Padding" Value="10,5"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="#2A2315"/>
+                                <Setter Property="Foreground" Value="#E3C341"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#1B1F27"/>
+                                <Setter Property="Foreground" Value="#111111"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ReadableTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#50000000"/>
+            <Setter Property="Foreground" Value="#E6EAF0"/>
+            <Setter Property="CaretBrush" Value="#E6EAF0"/>
+            <Setter Property="BorderBrush" Value="#2E3A46"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="MinWidth" Value="210"/>
+        </Style>
+
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Background" Value="#090D14"/>
+            <Setter Property="Foreground" Value="#DFE4EC"/>
+            <Setter Property="Padding" Value="10,5"/>
             <Style.Triggers>
                 <Trigger Property="IsHighlighted" Value="True">
-                    <Setter Property="Background" Value="#E94560"/>
-                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Background" Value="#2A2315"/>
+                    <Setter Property="Foreground" Value="#E3C341"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="White"/>
-                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="Background" Value="#1B1F27"/>
+                    <Setter Property="Foreground" Value="#111111"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </Page.Resources>
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="10" VerticalAlignment="Top">
-            <!-- Faction Selection -->
-            <TextBlock Text="Faction" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
-            <ComboBox x:Name="FactionCombo" 
-                      ItemsSource="{Binding Factions}"
-                      DisplayMemberPath="Title"
-                      SelectedValuePath="Id"
-                      SelectedValue="{Binding SelectedFactionId}"
-                      SelectionChanged="FactionCombo_SelectionChanged"
-                      Margin="0,0,0,10"
-                      Style="{StaticResource ReadableComboBox}"/>
-            
-            <!-- Role Selection -->
-            <TextBlock Text="Role" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
-            <ComboBox x:Name="RoleCombo" 
-                      ItemsSource="{Binding Roles}"
-                      DisplayMemberPath="Name"
-                      SelectedValuePath="Id"
-                      SelectedValue="{Binding SelectedRoleId}"
-                      Margin="0,0,0,10"
-                      Style="{StaticResource ReadableComboBox}"/>
-            
-            <!-- Divider -->
-            <Separator Margin="0,15,0,15" Foreground="#444" Height="1"/>
-            
-            <!-- Keybinds Section -->
-            <TextBlock Text="Keybinds" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
-            <TextBlock FontSize="10" Foreground="#CCCCCC" Margin="0,0,0,10"
-                       Text="Global hotkeys for overlay control. Changes take effect immediately."/>
-            
-            <!-- Previous Order Keybind -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Previous:" VerticalAlignment="Center" Width="70" Foreground="White" FontSize="11"/>
-                <TextBox x:Name="KeyPrevBox" Width="100" Padding="6" Text="Left Arrow"
-                         Background="White" Foreground="Black" CaretBrush="Black" BorderBrush="#888"/>
-            </StackPanel>
-            
-            <!-- Next Order Keybind -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Next:" VerticalAlignment="Center" Width="70" Foreground="White" FontSize="11"/>
-                <TextBox x:Name="KeyNextBox" Width="100" Padding="6" Text="Right Arrow"
-                         Background="White" Foreground="Black" CaretBrush="Black" BorderBrush="#888"/>
-            </StackPanel>
-            
-            <!-- Minimize Keybind -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Minimize:" VerticalAlignment="Center" Width="70" Foreground="White" FontSize="11"/>
-                <TextBox x:Name="KeyMinimizeBox" Width="100" Padding="6" Text="F9"
-                         Background="White" Foreground="Black" CaretBrush="Black" BorderBrush="#888"/>
-            </StackPanel>
-            
-            <!-- Restore Keybind -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Restore:" VerticalAlignment="Center" Width="70" Foreground="White" FontSize="11"/>
-                <TextBox x:Name="KeyRestoreBox" Width="100" Padding="6" Text="F9"
-                         Background="White" Foreground="Black" CaretBrush="Black" BorderBrush="#888"/>
-            </StackPanel>
+    <Grid Background="Transparent">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="8,8,8,12" VerticalAlignment="Top">
+                <DockPanel Margin="0,0,0,10">
+                    <TextBlock Text="UNITS" Style="{StaticResource SectionTitleStyle}"/>
+                    <Border Style="{StaticResource SectionLineStyle}"/>
+                </DockPanel>
 
-            <!-- Info Section -->
-            <Separator Margin="0,15,0,15" Foreground="#444" Height="1"/>
-            <TextBlock FontSize="10" Foreground="White" TextWrapping="Wrap" Margin="0,0,0,15">
-                <Run FontWeight="Bold" Foreground="#FFD700" Text="Info: "/>
-                <Run Text="Use the overlay to view BMS orders published by faction officers. Select a faction to authenticate and view its content."/>
-            </TextBlock>
-        </StackPanel>
-    </ScrollViewer>
+                <Border Style="{StaticResource SettingRowStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="FACTION" Style="{StaticResource SettingLabelStyle}"/>
+                        <ComboBox x:Name="FactionCombo" Grid.Column="1"
+                                  ItemsSource="{Binding Factions}"
+                                  DisplayMemberPath="Title"
+                                  SelectedValuePath="Id"
+                                  SelectedValue="{Binding SelectedFactionId}"
+                                  SelectionChanged="FactionCombo_SelectionChanged"
+                                  Style="{StaticResource ReadableComboBox}"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource SettingRowStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="ROLE" Style="{StaticResource SettingLabelStyle}"/>
+                        <ComboBox x:Name="RoleCombo" Grid.Column="1"
+                                  ItemsSource="{Binding Roles}"
+                                  DisplayMemberPath="Name"
+                                  SelectedValuePath="Id"
+                                  SelectedValue="{Binding SelectedRoleId}"
+                                  Style="{StaticResource ReadableComboBox}"/>
+                    </Grid>
+                </Border>
+
+                <DockPanel Margin="0,0,0,10">
+                    <TextBlock Text="KEYBINDS" Style="{StaticResource SectionTitleStyle}"/>
+                    <Border Style="{StaticResource SectionLineStyle}"/>
+                </DockPanel>
+
+                <Border Style="{StaticResource SettingRowStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="PREVIOUS ORDER" Style="{StaticResource SettingLabelStyle}"/>
+                        <TextBox x:Name="KeyPrevBox" Grid.Column="1" Text="Left Arrow" Style="{StaticResource ReadableTextBox}"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource SettingRowStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="NEXT ORDER" Style="{StaticResource SettingLabelStyle}"/>
+                        <TextBox x:Name="KeyNextBox" Grid.Column="1" Text="Right Arrow" Style="{StaticResource ReadableTextBox}"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource SettingRowStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="MINIMIZE" Style="{StaticResource SettingLabelStyle}"/>
+                        <TextBox x:Name="KeyMinimizeBox" Grid.Column="1" Text="F9" Style="{StaticResource ReadableTextBox}"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource SettingRowStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="RESTORE" Style="{StaticResource SettingLabelStyle}"/>
+                        <TextBox x:Name="KeyRestoreBox" Grid.Column="1" Text="F9" Style="{StaticResource ReadableTextBox}"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource SettingRowStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="TOGGLE OVERLAY" Style="{StaticResource SettingLabelStyle}"/>
+                            <TextBlock Text="Key passes through to Roblox" Foreground="#7A8290" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <TextBox x:Name="KeyToggleBox" Grid.Column="1"
+                                 Style="{StaticResource ReadableTextBox}"
+                                 IsReadOnly="True" Cursor="Hand"
+                                 PreviewKeyDown="KeyToggleBox_PreviewKeyDown"
+                                 GotFocus="KeyToggleBox_GotFocus"
+                                 LostFocus="KeyToggleBox_LostFocus"/>
+                    </Grid>
+                </Border>
+
+                <!-- DISPLAY section -->
+                <DockPanel Margin="0,0,0,10">
+                    <TextBlock Text="DISPLAY" Style="{StaticResource SectionTitleStyle}"/>
+                    <Border Style="{StaticResource SectionLineStyle}"/>
+                </DockPanel>
+
+                <Border Style="{StaticResource SettingRowStyle}" Margin="0,0,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="OVERLAY WIDTH" Style="{StaticResource SettingLabelStyle}"/>
+                        <TextBox x:Name="WidthInput" Grid.Column="1"
+                                 Style="{StaticResource ReadableTextBox}"
+                                 MinWidth="80" MaxWidth="100" TextAlignment="Center"
+                                 LostFocus="WidthInput_LostFocus"
+                                 PreviewKeyDown="WidthInput_PreviewKeyDown"
+                                 PreviewTextInput="WidthInput_PreviewTextInput"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource SettingRowStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="JTAC MODE" Style="{StaticResource SettingLabelStyle}"/>
+                            <TextBlock Text="Shifts overlay down &amp; right for JTAC view" Foreground="#7A8290" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border x:Name="JtacOnBorder" BorderThickness="1" CornerRadius="3" Margin="0,0,4,0" Cursor="Hand"
+                                    MouseLeftButtonUp="JtacOn_Click">
+                                <TextBlock x:Name="JtacOnText" Text="ON" FontWeight="Bold" FontSize="12"
+                                           Padding="16,5" HorizontalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="JtacOffBorder" BorderThickness="1" CornerRadius="3" Cursor="Hand"
+                                    MouseLeftButtonUp="JtacOff_Click">
+                                <TextBlock x:Name="JtacOffText" Text="OFF" FontWeight="Bold" FontSize="12"
+                                           Padding="16,5" HorizontalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <DockPanel Margin="0,0,0,10">
+                    <TextBlock Text="INFO" Style="{StaticResource SectionTitleStyle}"/>
+                    <Border Style="{StaticResource SectionLineStyle}"/>
+                </DockPanel>
+
+                <Border Style="{StaticResource SettingRowStyle}" Margin="0,0,0,6">
+                    <TextBlock FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap">
+                        <Run Foreground="{StaticResource GoldTextBrush}" FontWeight="Bold" Text="BMS OVERLAY: "/>
+                        <Run Text="Select your faction and role, then use keybinds and arrows to navigate published orders. Poll and checklist updates sync in real time."/>
+                    </TextBlock>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </Page>
