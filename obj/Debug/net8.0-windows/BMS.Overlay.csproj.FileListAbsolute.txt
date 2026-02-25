@@ -21,10 +21,10 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.Gen
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.AssemblyInfoInputs.cache
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.AssemblyInfo.cs
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.csproj.CoreCompileInputs.cache
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.sourcelink.json
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Over.B498641E.Up2Date
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\refint\BMS.Overlay.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.pdb
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.genruntimeconfig.cache
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\ref\BMS.Overlay.dll
-C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.sourcelink.json

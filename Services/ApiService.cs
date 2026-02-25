@@ -39,13 +39,16 @@ public class ApiService
     {
         // Allow override via constructor, otherwise use defaults
         // For local development: http://localhost:8080/api/v1
-        // For production: https://bms-production-f22e.up.railway.app/api/v1/
-        _baseUrl = baseUrl ?? "http://localhost:8080/api/v1";
+        // For production: https://bms-production-f22e.up.railway.app/api/v1
+        _baseUrl = (baseUrl ?? "http://localhost:8080/api/v1").TrimEnd('/');
         
         var handler = new HttpClientHandler();
+        // Disable SSL verification for testing (remove in production for security)
+        handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+        
         _httpClient = new HttpClient(handler)
         {
-            BaseAddress = new Uri(_baseUrl),
+            BaseAddress = new Uri(_baseUrl + "/"),
             Timeout = TimeSpan.FromSeconds(15)
         };
     }
@@ -117,15 +120,19 @@ public class ApiService
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine($"Fetching factions from: {_httpClient.BaseAddress}factions");
+            var endpoint = $"{_httpClient.BaseAddress}factions";
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Fetching factions from: {endpoint}");
+            
             var response = await _httpClient.GetAsync("factions");
             var json = await response.Content.ReadAsStringAsync();
             
-            System.Diagnostics.Debug.WriteLine($"Faction response [{response.StatusCode}]: {json[..Math.Min(json.Length, 200)]}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Response status: {response.StatusCode}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Response body: {json[..Math.Min(json.Length, 300)]}");
 
             if (!response.IsSuccessStatusCode)
             {
-                System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {response.ReasonPhrase}");
+                System.Diagnostics.Debug.WriteLine($"[Overlay API] ERROR: Status {response.StatusCode} - {response.ReasonPhrase}");
+                System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock data");
                 _isOfflineMode = true;
                 return GetMockFactions();
             }
@@ -137,8 +144,10 @@ public class ApiService
             if (apiResponse?.Success == true && apiResponse.Data != null)
             {
                 _isOfflineMode = false;
+                System.Diagnostics.Debug.WriteLine($"[Overlay API] Successfully parsed {apiResponse.Data.Count} factions");
+                
                 // Convert FactionDto to FactionInfo
-                return apiResponse.Data.Select(f => new FactionInfo
+                var result = apiResponse.Data.Select(f => new FactionInfo
                 {
                     Id = f.Id,
                     Title = f.Title,
@@ -151,27 +160,38 @@ public class ApiService
                         IsDefault = r.IsDefault
                     }).ToList() ?? new()
                 }).ToList();
+                
+                foreach (var f in result)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Overlay API]   - Faction: {f.Title}");
+                }
+                
+                return result;
             }
 
-            System.Diagnostics.Debug.WriteLine($"Failed to parse faction response: Success={apiResponse?.Success}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Failed to parse response: Success={apiResponse?.Success}, Data={apiResponse?.Data == null}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock data");
             _isOfflineMode = true;
             return GetMockFactions();
         }
         catch (HttpRequestException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Network Error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] NETWORK ERROR: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock data");
             _isOfflineMode = true;
             return GetMockFactions();
         }
         catch (JsonException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"JSON Parse Error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] JSON PARSE ERROR: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock data");
             _isOfflineMode = true;
             return GetMockFactions();
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"API Error: {ex.Message}\n{ex.StackTrace}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] UNEXPECTED ERROR: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Stack trace: {ex.StackTrace}");
             return new();
         }
     }
