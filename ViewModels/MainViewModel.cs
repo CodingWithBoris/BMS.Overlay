@@ -11,8 +11,10 @@ namespace BMS.Overlay.ViewModels
     {
         private readonly ApiService _apiService;
         private readonly SettingsService _settingsService;
+        private readonly SignalRService? _signalRService;
 
         private List<BmsOrder> _orders = new();
+        private List<BmsOrder> _allOrders = new(); // unfiltered orders from API
         private List<FactionInfo> _factions = new();
         private int _currentOrderIndex = 0;
         private string _currentTab = "BMS";
@@ -23,11 +25,46 @@ namespace BMS.Overlay.ViewModels
 
         public ObservableCollection<FactionInfo> Factions { get; } = new();
         public ObservableCollection<BmsOrder> Orders { get; } = new();
+        public ObservableCollection<RoleInfo> Roles { get; } = new();
 
-        public MainViewModel(ApiService apiService, SettingsService settingsService)
+        public MainViewModel(ApiService apiService, SettingsService settingsService, SignalRService? signalRService = null)
         {
             _apiService = apiService;
             _settingsService = settingsService;
+            _signalRService = signalRService;
+
+            // Subscribe to SignalR real-time updates
+            if (_signalRService != null)
+            {
+                _signalRService.OnOrdersUpdated += OnOrdersUpdatedFromSignalR;
+            }
+        }
+
+        private async void OnOrdersUpdatedFromSignalR(string factionId, string orderId, string action)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"SignalR event: OrdersUpdated for faction={factionId}, action={action}");
+
+                // Only refresh if we're viewing the same faction
+                if (string.IsNullOrEmpty(SelectedFactionId) ||
+                    (!string.IsNullOrEmpty(factionId) && factionId != SelectedFactionId))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Ignoring SignalR update: viewing {SelectedFactionId}, update for {factionId}");
+                    return;
+                }
+
+                // Refresh orders from server
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    await LoadOrdersAsync();
+                    System.Diagnostics.Debug.WriteLine($"Orders refreshed via SignalR (action={action})");
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error handling SignalR update: {ex.Message}");
+            }
         }
 
         public string CurrentTab
@@ -92,6 +129,8 @@ namespace BMS.Overlay.ViewModels
                 {
                     _selectedRoleId = value;
                     OnPropertyChanged();
+                    // Re-filter orders when role changes
+                    FilterOrdersByRole();
                 }
             }
         }
@@ -134,21 +173,16 @@ namespace BMS.Overlay.ViewModels
             {
                 if (string.IsNullOrEmpty(SelectedFactionId))
                 {
+                    _allOrders.Clear();
                     _orders.Clear();
                     Orders.Clear();
                     CurrentOrder = null;
                     return;
                 }
 
-                _orders = await _apiService.GetOrdersAsync(SelectedFactionId);
-                Orders.Clear();
-                foreach (var order in _orders.OrderBy(o => o.OrderIndex))
-                {
-                    Orders.Add(order);
-                }
-
-                CurrentOrderIndex = 0;
-                UpdateCurrentOrder();
+                _allOrders = await _apiService.GetOrdersAsync(SelectedFactionId);
+                System.Diagnostics.Debug.WriteLine($"Loaded {_allOrders.Count} orders from API");
+                FilterOrdersByRole();
             }
             catch (Exception ex)
             {
@@ -156,10 +190,57 @@ namespace BMS.Overlay.ViewModels
             }
         }
 
+        private void FilterOrdersByRole()
+        {
+            // Filter orders: show orders matching selected role, or orders with no role assigned (visible to all)
+            if (string.IsNullOrEmpty(SelectedRoleId) || SelectedRoleId == "__all__")
+            {
+                // No role filter - show all orders
+                _orders = _allOrders.ToList();
+            }
+            else
+            {
+                _orders = _allOrders
+                    .Where(o => string.IsNullOrEmpty(o.RoleId) || o.RoleId == SelectedRoleId)
+                    .ToList();
+            }
+
+            Orders.Clear();
+            foreach (var order in _orders.OrderBy(o => o.OrderIndex))
+            {
+                Orders.Add(order);
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Filtered to {_orders.Count} orders (role={SelectedRoleId ?? "all"})");
+
+            CurrentOrderIndex = 0;
+            OnPropertyChanged(nameof(TotalOrders));
+            UpdateCurrentOrder();
+        }
+
         public async Task SelectFactionAsync(FactionInfo faction)
         {
             SelectedFactionId = faction.Id;
+
+            // Populate roles for the selected faction
+            Roles.Clear();
+            Roles.Add(new RoleInfo { Id = "__all__", Name = "All Roles", IsDefault = false });
+            if (faction.Roles != null)
+            {
+                foreach (var role in faction.Roles)
+                {
+                    Roles.Add(role);
+                }
+            }
+            SelectedRoleId = "__all__";
+            OnPropertyChanged(nameof(Roles));
             await LoadOrdersAsync();
+
+            // Subscribe to real-time updates for this faction
+            if (_signalRService != null)
+            {
+                await _signalRService.SubscribeToFactionAsync(faction.Id);
+            }
         }
 
         public void NextOrder()

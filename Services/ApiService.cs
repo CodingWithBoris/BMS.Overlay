@@ -29,6 +29,18 @@ internal class RoleDto
     public bool IsDefault { get; set; }
 }
 
+internal class BmsOrderDto
+{
+    public string Id { get; set; } = string.Empty;
+    public int OrderIndex { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string? RoleId { get; set; }
+    public bool IsPublished { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
 public class ApiService
 {
     private readonly HttpClient _httpClient;
@@ -69,29 +81,75 @@ public class ApiService
     {
         try
         {
+            var endpoint = $"{_httpClient.BaseAddress}factions/{factionId}/orders";
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Fetching orders from: {endpoint}");
+            
             var response = await _httpClient.GetAsync($"factions/{factionId}/orders");
+            var json = await response.Content.ReadAsStringAsync();
+            
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Orders response status: {response.StatusCode}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Orders response body: {json[..Math.Min(json.Length, 500)]}");
             
             if (!response.IsSuccessStatusCode)
             {
-                System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {response.ReasonPhrase}");
+                System.Diagnostics.Debug.WriteLine($"[Overlay API] ERROR: Status {response.StatusCode} - {response.ReasonPhrase}");
+                System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock orders");
                 _isOfflineMode = true;
                 return GetMockOrders();
             }
 
-            _isOfflineMode = false;
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<BmsOrder>>(json, 
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+            // Parse the ApiResponse wrapper (same as GetFactionsAsync)
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<BmsOrderDto>>>(json, 
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (apiResponse?.Success == true && apiResponse.Data != null)
+            {
+                _isOfflineMode = false;
+                System.Diagnostics.Debug.WriteLine($"[Overlay API] Successfully parsed {apiResponse.Data.Count} orders");
+                
+                // Convert BmsOrderDto to BmsOrder
+                var result = apiResponse.Data.Select(o => new BmsOrder
+                {
+                    Id = o.Id,
+                    OrderIndex = o.OrderIndex,
+                    Title = o.Title,
+                    Content = o.Content,
+                    RoleId = o.RoleId,
+                    IsPublished = o.IsPublished,
+                    CreatedAt = o.CreatedAt,
+                    UpdatedAt = o.UpdatedAt
+                }).ToList();
+                
+                foreach (var order in result)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Overlay API]   - Order #{order.OrderIndex}: {order.Title}");
+                }
+                
+                return result;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Failed to parse orders response: Success={apiResponse?.Success}, Data={apiResponse?.Data == null}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock orders");
+            _isOfflineMode = true;
+            return GetMockOrders();
         }
         catch (HttpRequestException ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Network Error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] NETWORK ERROR fetching orders: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock orders");
+            _isOfflineMode = true;
+            return GetMockOrders();
+        }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] JSON PARSE ERROR for orders: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Falling back to mock orders");
             _isOfflineMode = true;
             return GetMockOrders();
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"API Error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] UNEXPECTED ERROR fetching orders: {ex.Message}");
             return new();
         }
     }

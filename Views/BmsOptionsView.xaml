@@ -43,11 +43,12 @@
             <!-- Role Selection -->
             <TextBlock Text="Role" FontWeight="Bold" Foreground="White" Margin="0,0,0,5"/>
             <ComboBox x:Name="RoleCombo" 
+                      ItemsSource="{Binding Roles}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Id"
                       SelectedValue="{Binding SelectedRoleId}"
                       Margin="0,0,0,10"
-                      Style="{StaticResource ReadableComboBox}">
-                <ComboBoxItem>Default</ComboBoxItem>
-            </ComboBox>
+                      Style="{StaticResource ReadableComboBox}"/>
             
             <!-- Divider -->
             <Separator Margin="0,15,0,15" Foreground="#444" Height="1"/>

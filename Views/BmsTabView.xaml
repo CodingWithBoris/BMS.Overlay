@@ -21,13 +21,14 @@
                 <Run Text="{Binding TotalOrders, Mode=OneWay}"/>
             </TextBlock>
 
-            <!-- Order Content -->
-            <Border BorderBrush="#555" BorderThickness="1" Padding="10" CornerRadius="4" Background="#0A2540">
-                <TextBlock x:Name="OrderContent"
-                           FontSize="12" Foreground="White"
-                           Text="{Binding CurrentOrder.Content, FallbackValue='Select a faction from BMS Options to view orders'}"
-                           TextWrapping="Wrap"
-                           Padding="10"/>
+            <!-- Order Content (renders FlowDocument XAML) -->
+            <Border BorderBrush="#555" BorderThickness="1" Padding="0" CornerRadius="4" Background="#0A2540">
+                <RichTextBox x:Name="OrderContent"
+                             FontSize="12" Foreground="White" Background="Transparent"
+                             IsReadOnly="True" BorderThickness="0"
+                             IsDocumentEnabled="True"
+                             Padding="10"
+                             VerticalScrollBarVisibility="Auto"/>
             </Border>
 
             <!-- No Orders Message -->

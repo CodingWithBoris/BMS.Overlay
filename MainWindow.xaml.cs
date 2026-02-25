@@ -11,16 +11,19 @@ namespace BMS.Overlay
     public partial class MainWindow : Window
     {
         private readonly ApiService _apiService;
+        private readonly SignalRService _signalRService;
         private HotkeyService? _hotkeyService;
         private readonly SettingsService _settingsService;
         private MainViewModel? _viewModel;
+
+        private const string ApiBaseUrl = "https://bms-production-f22e.up.railway.app/api/v1";
 
         public MainWindow()
         {
             InitializeComponent();
 
-            // Use production endpoint for testing
-            _apiService = new ApiService("https://bms-production-f22e.up.railway.app/api/v1");
+            _apiService = new ApiService(ApiBaseUrl);
+            _signalRService = new SignalRService(ApiBaseUrl);
             _settingsService = new SettingsService();
             
             // Set window properties
@@ -59,9 +62,14 @@ namespace BMS.Overlay
 
                 // Initialize ViewModel
                 System.Diagnostics.Debug.WriteLine("Creating ViewModel...");
-                _viewModel = new MainViewModel(_apiService, _settingsService);
+                _viewModel = new MainViewModel(_apiService, _settingsService, _signalRService);
                 DataContext = _viewModel;
                 System.Diagnostics.Debug.WriteLine("ViewModel created and DataContext set");
+
+                // Connect SignalR for real-time updates
+                System.Diagnostics.Debug.WriteLine("Connecting SignalR...");
+                await _signalRService.ConnectAsync();
+                System.Diagnostics.Debug.WriteLine($"SignalR connected: {_signalRService.IsConnected}");
 
                 // Load data
                 System.Diagnostics.Debug.WriteLine("Loading factions...");
@@ -169,9 +177,10 @@ namespace BMS.Overlay
             RestoreBar.Visibility = Visibility.Collapsed;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _hotkeyService?.Dispose();
+            await _signalRService.DisposeAsync();
         }
     }
 }
