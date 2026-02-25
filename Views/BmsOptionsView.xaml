@@ -223,12 +223,19 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="OVERLAY WIDTH" Style="{StaticResource SettingLabelStyle}"/>
-                        <TextBox x:Name="WidthInput" Grid.Column="1"
-                                 Style="{StaticResource ReadableTextBox}"
-                                 MinWidth="80" MaxWidth="100" TextAlignment="Center"
-                                 LostFocus="WidthInput_LostFocus"
-                                 PreviewKeyDown="WidthInput_PreviewKeyDown"
-                                 PreviewTextInput="WidthInput_PreviewTextInput"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBox x:Name="WidthInput"
+                                     Style="{StaticResource ReadableTextBox}"
+                                     MinWidth="80" MaxWidth="100" TextAlignment="Center"
+                                     PreviewTextInput="WidthInput_PreviewTextInput"
+                                     PreviewKeyDown="WidthInput_PreviewKeyDown"/>
+                            <Border x:Name="WidthApplyButton" Margin="6,0,0,0" Padding="8,5" CornerRadius="3"
+                                    Background="#50000000" BorderBrush="#2E3A46" BorderThickness="1"
+                                    Cursor="Hand" MouseLeftButtonUp="WidthApplyButton_Click">
+                                <TextBlock Text="&#x2713;" FontSize="14" FontWeight="Bold"
+                                           Foreground="#E3C341" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
                     </Grid>
                 </Border>
 

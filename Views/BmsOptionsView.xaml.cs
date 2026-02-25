@@ -83,7 +83,7 @@ namespace BMS.Overlay.Views
             FactionCombo.Focus();
         }
 
-        private void WidthInput_LostFocus(object sender, System.Windows.RoutedEventArgs e)
+        private void WidthApplyButton_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             ApplyWidthFromInput();
         }
