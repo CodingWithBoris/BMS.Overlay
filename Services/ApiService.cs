@@ -50,6 +50,7 @@ internal class OrderSectionDto
     public string Title { get; set; } = string.Empty;
     public string? Content { get; set; }
     public string? ImageUrl { get; set; }
+    public string? VideoUrl { get; set; }
     public bool AllowMultipleChoice { get; set; }
     public List<PollOptionDto>? PollOptions { get; set; }
     public List<ChecklistItemDto>? ChecklistItems { get; set; }
@@ -162,6 +163,7 @@ public class ApiService
                         Title = s.Title,
                         Content = s.Content,
                         ImageUrl = s.ImageUrl,
+                        VideoUrl = s.VideoUrl,
                         AllowMultipleChoice = s.AllowMultipleChoice,
                         PollOptions = s.PollOptions?.Select(p => new PollOption
                         {

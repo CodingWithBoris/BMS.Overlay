@@ -121,6 +121,9 @@ namespace BMS.Overlay.Views
                 case "image":
                     RenderImageSection(container, section);
                     break;
+                case "video":
+                    RenderVideoSection(container, section);
+                    break;
                 case "poll":
                     RenderPollSection(container, section, order);
                     break;
@@ -207,6 +210,136 @@ namespace BMS.Overlay.Views
                 parent.Children.Add(new TextBlock
                 {
                     Text = $"[Image: {section.ImageUrl}]",
+                    Foreground = Brushes.Gray,
+                    FontStyle = FontStyles.Italic,
+                });
+            }
+        }
+
+        private void RenderVideoSection(StackPanel parent, OrderSection section)
+        {
+            if (string.IsNullOrEmpty(section.VideoUrl)) return;
+
+            var url = section.VideoUrl.Trim();
+            var isGif = url.Split('?')[0].EndsWith(".gif", StringComparison.OrdinalIgnoreCase);
+
+            if (isGif)
+            {
+                // GIFs: render as Image (MediaElement doesn't support GIF format)
+                RenderGifAsImage(parent, url);
+            }
+            else
+            {
+                // Video: render via MediaElement (.mp4, .wmv, etc.)
+                RenderVideoMediaElement(parent, url);
+            }
+        }
+
+        private void RenderGifAsImage(StackPanel parent, string url)
+        {
+            try
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(url, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+
+                var image = new Image
+                {
+                    Source = bitmap,
+                    Stretch = Stretch.Uniform,
+                    MaxHeight = 350,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Margin = new Thickness(0, 0, 0, 4),
+                };
+
+                var border = new Border
+                {
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x26, 0x30, 0x3A)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(4),
+                    Background = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x00, 0x00)),
+                    Padding = new Thickness(6),
+                    Child = image,
+                };
+                parent.Children.Add(border);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading GIF: {ex.Message}");
+                parent.Children.Add(new TextBlock
+                {
+                    Text = $"[GIF: {url}]",
+                    Foreground = Brushes.Gray,
+                    FontStyle = FontStyles.Italic,
+                });
+            }
+        }
+
+        private void RenderVideoMediaElement(StackPanel parent, string url)
+        {
+            try
+            {
+                var mediaElement = new MediaElement
+                {
+                    LoadedBehavior = MediaState.Manual,
+                    UnloadedBehavior = MediaState.Close,
+                    Stretch = Stretch.Uniform,
+                    MaxHeight = 350,
+                    MinHeight = 80,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Margin = new Thickness(0, 0, 0, 4),
+                };
+
+                var border = new Border
+                {
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x26, 0x30, 0x3A)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(4),
+                    Background = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x00, 0x00)),
+                    Padding = new Thickness(6),
+                    Child = mediaElement,
+                };
+
+                // Add to visual tree first, then set source and play
+                parent.Children.Add(border);
+
+                mediaElement.MediaOpened += (s, e) =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"Video opened: {url}");
+                    mediaElement.Play();
+                };
+                mediaElement.MediaEnded += (s, e) =>
+                {
+                    mediaElement.Position = TimeSpan.Zero;
+                    mediaElement.Play();
+                };
+                mediaElement.MediaFailed += (s, e) =>
+                {
+                    System.Diagnostics.Debug.WriteLine($"Video failed: {e.ErrorException?.Message}");
+                    Dispatcher.Invoke(() =>
+                    {
+                        border.Child = new TextBlock
+                        {
+                            Text = $"[Video failed to load: {url}]",
+                            Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0x66, 0x66)),
+                            FontStyle = FontStyles.Italic,
+                            TextWrapping = TextWrapping.Wrap,
+                            Padding = new Thickness(4),
+                        };
+                    });
+                };
+
+                mediaElement.Source = new Uri(url, UriKind.Absolute);
+                mediaElement.Play();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading video: {ex.Message}");
+                parent.Children.Add(new TextBlock
+                {
+                    Text = $"[Video: {url}]",
                     Foreground = Brushes.Gray,
                     FontStyle = FontStyles.Italic,
                 });
