@@ -1,1 +1,3 @@
+C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.pdb
+C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Shared.pdb
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.exe

@@ -39,6 +39,10 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\BMS.O
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\refint\BMS.Overlay.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\BMS.Overlay.genruntimeconfig.cache
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\ref\BMS.Overlay.dll
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\BMS.Overlay.pdb
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\BMS.Shared.pdb
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\BMS.Overlay.sourcelink.json
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\BMS.Overlay.pdb
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Microsoft.CSharp.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Microsoft.VisualBasic.Core.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Microsoft.Win32.Primitives.dll
