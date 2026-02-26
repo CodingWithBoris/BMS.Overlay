@@ -311,10 +311,36 @@ namespace BMS.Overlay.ViewModels
             _settingsService.UpdateSettings(settings);
             _ = _settingsService.SaveAsync();
 
-            // Tell MainWindow to re-register the hook with the new key
+            // Tell MainWindow to re-register all hooks
             if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
             {
-                mainWindow.RegisterToggleKey(keyName);
+                mainWindow.RegisterAllKeybinds();
+            }
+        }
+
+        /// <summary>
+        /// Update any keybind setting by name and re-register all hooks.
+        /// </summary>
+        public void UpdateKeybind(string settingName, string keyName)
+        {
+            var settings = _settingsService.GetSettings();
+
+            switch (settingName)
+            {
+                case "KeyPrevious": settings.KeyPrevious = keyName; break;
+                case "KeyNext": settings.KeyNext = keyName; break;
+                case "KeyMinimize": settings.KeyMinimize = keyName; break;
+                case "KeyRestore": settings.KeyRestore = keyName; break;
+                case "KeyToggleOverlay": settings.KeyToggleOverlay = keyName; break;
+                default: return;
+            }
+
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.RegisterAllKeybinds();
             }
         }
 

@@ -1,0 +1,30 @@
+[FORM]
+LINE 1 – Radio Frequency, Call Sign, Suffix
+
+Frequency: __
+Call Sign: __
+Suffix: __
+
+LINE 2 – Location of Pick-Up Site (Grid)
+
+Grid (6–8 Digits): __
+Grid Zone (if needed): __
+
+LINE 3 – Number of Patients by Precedence
+
+A – Immediate: __
+B – Urgent: __
+C – Priority: __
+D – Routine: __
+
+LINE 4 – Special Equipment Required
+
+A – None ☐
+B – Interior Seating ☐
+C – Other: __
+
+LINE 5 – Number of Patients by Condition
+
+A – Operational: __
+B – Stable: __
+C – Wounded (Low HP / No Meds): __

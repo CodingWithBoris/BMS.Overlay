@@ -502,3 +502,9 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\zh-Ha
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\zh-Hant\UIAutomationTypes.resources.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\zh-Hant\WindowsBase.resources.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\zh-Hant\WindowsFormsIntegration.resources.dll
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Templates\AfterActionReport.md
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Templates\EmergencyExvil.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Templates\HLZBrief.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Templates\OperationBrief.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\Views\NotepadWindow.baml
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\Views\NotepadWindow.g.cs

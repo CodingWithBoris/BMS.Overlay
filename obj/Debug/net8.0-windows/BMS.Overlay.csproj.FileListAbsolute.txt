@@ -1,3 +1,7 @@
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Debug\net8.0-windows\Templates\AfterActionReport.md
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Debug\net8.0-windows\Templates\EmergencyExvil.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Debug\net8.0-windows\Templates\HLZBrief.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Debug\net8.0-windows\Templates\OperationBrief.txt
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Debug\net8.0-windows\BMS.Overlay.exe
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Debug\net8.0-windows\BMS.Overlay.deps.json
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Debug\net8.0-windows\BMS.Overlay.runtimeconfig.json
@@ -24,10 +28,12 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.csp
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\MainWindow.baml
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\BmsOptionsView.baml
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\BmsTabView.baml
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\NotepadWindow.baml
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\PasswordPromptWindow.baml
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\MainWindow.g.cs
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\BmsOptionsView.g.cs
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\BmsTabView.g.cs
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\NotepadWindow.g.cs
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\Views\PasswordPromptWindow.g.cs
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\App.g.cs
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay_MarkupCompile.cache
@@ -43,3 +49,6 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\refint\BMS.Over
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.pdb
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay.genruntimeconfig.cache
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\ref\BMS.Overlay.dll
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\BMS.Overlay_MarkupCompile.lref
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\App.baml
+C:\GIT\Private Projects\bms\bms.overlay\bin\Debug\net8.0-windows\Templates\HLZBrief.md

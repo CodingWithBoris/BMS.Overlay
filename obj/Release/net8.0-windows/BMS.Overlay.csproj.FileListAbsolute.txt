@@ -39,3 +39,9 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Microsoft.Ext
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Microsoft.Extensions.Options.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Microsoft.Extensions.Primitives.dll
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\System.IO.Pipelines.dll
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Templates\AfterActionReport.md
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Templates\EmergencyExvil.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Templates\HLZBrief.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Templates\OperationBrief.txt
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\Views\NotepadWindow.baml
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\Views\NotepadWindow.g.cs

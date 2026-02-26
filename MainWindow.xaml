@@ -8,122 +8,15 @@
         Title="BMS Overlay"
         Closing="Window_Closing">
     <Window.Resources>
-        <LinearGradientBrush x:Key="GoldButtonBackground" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#111113" Offset="0"/>
-            <GradientStop Color="#2A2315" Offset="0.5"/>
-            <GradientStop Color="#111113" Offset="1"/>
-        </LinearGradientBrush>
+        <!-- ═══ TACTICAL DESIGN SYSTEM — FLAT / NO GRADIENTS / NO ROUNDED CORNERS ═══ -->
 
-        <LinearGradientBrush x:Key="GoldButtonBackgroundHover" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#1A1A1D" Offset="0"/>
-            <GradientStop Color="#3A311B" Offset="0.5"/>
-            <GradientStop Color="#1A1A1D" Offset="1"/>
-        </LinearGradientBrush>
+        <!-- Gold (active/selected state only) -->
+        <!-- Button styles and color resources now in App.xaml -->
 
-        <SolidColorBrush x:Key="GoldBorderBrush" Color="#D4AF37"/>
-        <SolidColorBrush x:Key="GoldTextBrush" Color="#E3C341"/>
-
-        <LinearGradientBrush x:Key="DarkButtonBackground" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#020407" Offset="0"/>
-            <GradientStop Color="#06090E" Offset="0.5"/>
-            <GradientStop Color="#020407" Offset="1"/>
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="DarkButtonBackgroundHover" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#05080D" Offset="0"/>
-            <GradientStop Color="#0A0E15" Offset="0.5"/>
-            <GradientStop Color="#05080D" Offset="1"/>
-        </LinearGradientBrush>
-
-        <SolidColorBrush x:Key="DarkBorderBrush" Color="#252B33"/>
-        <SolidColorBrush x:Key="DarkTextBrush" Color="#6F747D"/>
-
-        <Style x:Key="OverlayGoldButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="{StaticResource GoldTextBrush}"/>
-            <Setter Property="Background" Value="{StaticResource GoldButtonBackground}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GoldBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1.5"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6"
-                                SnapsToDevicePixels="True">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              RecognizesAccessKey="True"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource GoldButtonBackgroundHover}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="OverlayDarkButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="{StaticResource DarkTextBrush}"/>
-            <Setter Property="Background" Value="{StaticResource DarkButtonBackground}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
-                                SnapsToDevicePixels="True">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              RecognizesAccessKey="True"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource DarkButtonBackgroundHover}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.92"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="OverlayTabButtonStyle" TargetType="Button" BasedOn="{StaticResource OverlayDarkButtonStyle}">
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Height" Value="44"/>
-            <Setter Property="Margin" Value="0"/>
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Foreground" Value="{StaticResource GoldTextBrush}"/>
-                    <Setter Property="Background" Value="{StaticResource GoldButtonBackground}"/>
-                    <Setter Property="BorderBrush" Value="{StaticResource GoldBorderBrush}"/>
-                    <Setter Property="BorderThickness" Value="1.5"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Slim white scrollbar -->
+        <!-- Slim scrollbar (olive-green tinted) -->
         <Style TargetType="ScrollBar">
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="MinWidth" Value="20"/>
+            <Setter Property="Width" Value="6"/>
+            <Setter Property="MinWidth" Value="6"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -137,8 +30,7 @@
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate TargetType="Thumb">
-                                                            <Border Background="White" Width="20" Height="75"
-                                                                    CornerRadius="0"/>
+                                                        <Border Background="#2A2A2A" Width="6" Height="60"/>
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>
@@ -153,8 +45,8 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="Orientation" Value="Horizontal">
-                    <Setter Property="Height" Value="20"/>
-                    <Setter Property="MinHeight" Value="20"/>
+                    <Setter Property="Height" Value="6"/>
+                    <Setter Property="MinHeight" Value="6"/>
                     <Setter Property="Width" Value="Auto"/>
                 </Trigger>
             </Style.Triggers>
@@ -162,42 +54,58 @@
     </Window.Resources>
     <Grid Background="Transparent">
         <!-- Main Panel (visible when not minimized) -->
-        <Border x:Name="MainPanel" Background="#B0080B12" CornerRadius="0,8,8,0"
+        <Border x:Name="MainPanel" Background="#E60A0A0A" BorderBrush="#2A2A2A" BorderThickness="0,0,1,1"
                 Visibility="Visible">
             <DockPanel>
                 <!-- Tab Bar -->
-                <Grid DockPanel.Dock="Top" Margin="6,5,6,0" MaxWidth="500" HorizontalAlignment="Stretch">
+                <Grid DockPanel.Dock="Top" Margin="0,0,0,0" MaxWidth="500" HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="1"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                        <Button x:Name="BmsTabButton" Grid.Column="0" Content="BMS" Height="44"
-                            Style="{StaticResource OverlayTabButtonStyle}"
+                    <Border Grid.Column="1" Background="#2A2A2A"/>
+                    <Button x:Name="BmsTabButton" Grid.Column="0" Content="BMS" Height="38"
+                            Style="{StaticResource TacticalTabButton}"
                             Click="OnBmsTab_Click"/>
-                        <Button x:Name="OptionsTabButton" Grid.Column="2" Content="BMS OPTIONS" Height="44"
-                            Style="{StaticResource OverlayTabButtonStyle}"
+                    <Button x:Name="OptionsTabButton" Grid.Column="2" Content="OPTIONS" Height="38"
+                            Style="{StaticResource TacticalTabButton}"
                             Click="OnOptionsTab_Click"/>
                 </Grid>
+
+                <!-- Separator under tabs -->
+                <Border DockPanel.Dock="Top" Height="1" Background="#2A2A2A"/>
                 
                 <!-- Bottom Nav -->
-                <Grid DockPanel.Dock="Bottom" Margin="6,0,6,5" Height="44" MaxWidth="500" HorizontalAlignment="Stretch">
+                <Grid DockPanel.Dock="Bottom" Margin="0" Height="38" MaxWidth="500" HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="1"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="1"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1"/>
+                        <ColumnDefinition Width="38"/>
                     </Grid.ColumnDefinitions>
 
-                        <Button x:Name="PrevButton" Grid.Column="0" Content="&lt;" Height="44" Click="OnPrev_Click"
-                            Style="{StaticResource OverlayDarkButtonStyle}"/>
-                        <Button x:Name="MinimizeButton" Grid.Column="2" Content="-" Height="44"
-                            Click="OnMinimize_Click" Style="{StaticResource OverlayDarkButtonStyle}"/>
-                        <Button x:Name="NextButton" Grid.Column="4" Content="&gt;" Height="44" Click="OnNext_Click"
-                            Style="{StaticResource OverlayDarkButtonStyle}"/>
+                    <Border Grid.Column="1" Background="#2A2A2A"/>
+                    <Border Grid.Column="3" Background="#2A2A2A"/>
+                    <Border Grid.Column="5" Background="#2A2A2A"/>
+
+                    <Button x:Name="PrevButton" Grid.Column="0" Content="◀" Height="38" Click="OnPrev_Click"
+                            Style="{StaticResource TacticalDarkButton}" FontSize="14"/>
+                    <Button x:Name="MinimizeButton" Grid.Column="2" Content="—" Height="38"
+                            Click="OnMinimize_Click" Style="{StaticResource TacticalDarkButton}" FontSize="14"/>
+                    <Button x:Name="NextButton" Grid.Column="4" Content="▶" Height="38" Click="OnNext_Click"
+                            Style="{StaticResource TacticalDarkButton}" FontSize="14"/>
+                    <Button x:Name="NotepadButton" Grid.Column="6" Content="📝" Height="38" Width="38"
+                            Click="OnNotepad_Click" Style="{StaticResource TacticalDarkButton}"
+                            ToolTip="OPEN NOTEPAD" FontSize="14"/>
                 </Grid>
+
+                <!-- Separator above bottom nav -->
+                <Border DockPanel.Dock="Bottom" Height="1" Background="#2A2A2A"/>
                 
                 <!-- Content -->
                 <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Background="Transparent"/>
@@ -205,9 +113,9 @@
         </Border>
         
         <!-- Minimized Bar -->
-        <Button x:Name="RestoreBar" Content="+"
-                VerticalAlignment="Bottom" Height="44" Width="500" MaxWidth="500" HorizontalAlignment="Stretch"
+        <Button x:Name="RestoreBar" Content="▲ RESTORE"
+                VerticalAlignment="Bottom" Height="38" HorizontalAlignment="Stretch"
                 Visibility="Collapsed"
-            Click="OnRestore_Click" Style="{StaticResource OverlayDarkButtonStyle}" FontSize="20"/>
+            Click="OnRestore_Click" Style="{StaticResource TacticalDarkButton}" FontSize="12"/>
     </Grid>
 </Window>

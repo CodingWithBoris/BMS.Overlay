@@ -1,4 +1,8 @@
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.exe
+C:\GIT\Private Projects\BMS\publish\Overlay\Templates\AfterActionReport.md
+C:\GIT\Private Projects\BMS\publish\Overlay\Templates\EmergencyExvil.txt
+C:\GIT\Private Projects\BMS\publish\Overlay\Templates\HLZBrief.txt
+C:\GIT\Private Projects\BMS\publish\Overlay\Templates\OperationBrief.txt
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.dll
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.deps.json
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.runtimeconfig.json

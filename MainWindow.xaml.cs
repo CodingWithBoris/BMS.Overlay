@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using BMS.Overlay.Services;
 using BMS.Overlay.ViewModels;
+using BMS.Overlay.Views;
 using BMS.Shared.Models;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -17,7 +18,10 @@ namespace BMS.Overlay
         private readonly SignalRService _signalRService;
         private KeyboardHookService? _keyboardHookService;
         private readonly SettingsService _settingsService;
+        private readonly NotepadService _notepadService;
+        private readonly SharedNotepadService _sharedNotepadService;
         private MainViewModel? _viewModel;
+        private NotepadWindow? _notepadWindow;
 
         private const string ApiBaseUrl = "https://bms-production-f22e.up.railway.app/api/v1";
         private const double MinimizedHeight = 44;
@@ -40,6 +44,8 @@ namespace BMS.Overlay
             _apiService = new ApiService(ApiBaseUrl);
             _signalRService = new SignalRService(ApiBaseUrl);
             _settingsService = new SettingsService();
+            _notepadService = new NotepadService();
+            _sharedNotepadService = new SharedNotepadService(ApiBaseUrl);
 
             // Set window properties — position below the Roblox game nav bar
             ApplyPosition();
@@ -96,6 +102,14 @@ namespace BMS.Overlay
                 if (overlayHandle != IntPtr.Zero && fgWindow == overlayHandle)
                     return true;
 
+                // Check if the notepad window is foreground
+                if (_notepadWindow != null && _notepadWindow.IsLoaded)
+                {
+                    var notepadHandle = new WindowInteropHelper(_notepadWindow).Handle;
+                    if (notepadHandle != IntPtr.Zero && fgWindow == notepadHandle)
+                        return true;
+                }
+
                 GetWindowThreadProcessId(fgWindow, out uint processId);
                 if (processId == 0) return false;
 
@@ -142,6 +156,12 @@ namespace BMS.Overlay
                     var reason = _isHiddenByUser ? "user toggled off (M)" : "Roblox not active";
                     System.Diagnostics.Debug.WriteLine($"[Overlay] Hidden ({reason})");
                 }
+            }
+
+            // Sync notepad window visibility
+            if (_notepadWindow != null && _notepadWindow.IsLoaded)
+            {
+                _notepadWindow.SetRobloxVisible(_robloxIsForeground && !_isHiddenByUser);
             }
         }
 
@@ -239,13 +259,8 @@ namespace BMS.Overlay
                 {
                     _keyboardHookService = new KeyboardHookService();
 
-                    // Navigation & minimize keys
-                    _keyboardHookService.Register(Key.Left, () => OnPrev_Click(null, null));
-                    _keyboardHookService.Register(Key.Right, () => OnNext_Click(null, null));
-                    _keyboardHookService.Register(Key.F9, () => OnMinimize_Click(null, null));
-
-                    // Toggle overlay key
-                    RegisterToggleKey(settings.KeyToggleOverlay);
+                    // Register all keybinds from settings
+                    RegisterAllKeybinds();
 
                     System.Diagnostics.Debug.WriteLine($"Keyboard hook registered (toggle: {settings.KeyToggleOverlay})");
                 }
@@ -295,8 +310,10 @@ namespace BMS.Overlay
             if (_viewModel == null) return;
 
             _viewModel.CurrentTab = "BMS";
-            BmsTabButton.IsEnabled = false;
+            BmsTabButton.IsEnabled = true;
             OptionsTabButton.IsEnabled = true;
+            BmsTabButton.Style = (Style)FindResource("TacticalGoldButton");
+            OptionsTabButton.Style = (Style)FindResource("TacticalDarkButton");
             PrevButton.Visibility = Visibility.Visible;
             NextButton.Visibility = Visibility.Visible;
             Grid.SetColumn(MinimizeButton, 2);
@@ -312,13 +329,15 @@ namespace BMS.Overlay
 
             _viewModel.CurrentTab = "Options";
             BmsTabButton.IsEnabled = true;
-            OptionsTabButton.IsEnabled = false;
+            OptionsTabButton.IsEnabled = true;
+            BmsTabButton.Style = (Style)FindResource("TacticalDarkButton");
+            OptionsTabButton.Style = (Style)FindResource("TacticalGoldButton");
             PrevButton.Visibility = Visibility.Collapsed;
             NextButton.Visibility = Visibility.Collapsed;
             Grid.SetColumn(MinimizeButton, 0);
             Grid.SetColumnSpan(MinimizeButton, 5);
-            PrevButton.Style = (Style)FindResource("OverlayDarkButtonStyle");
-            NextButton.Style = (Style)FindResource("OverlayDarkButtonStyle");
+            PrevButton.Style = (Style)FindResource("TacticalDarkButton");
+            NextButton.Style = (Style)FindResource("TacticalDarkButton");
 
             ContentFrame.Navigate(new Views.BmsOptionsView { DataContext = _viewModel });
         }
@@ -355,17 +374,17 @@ namespace BMS.Overlay
             if (_viewModel.CurrentTab != "BMS")
                 return;
 
-            PrevButton.Style = (Style)FindResource("OverlayDarkButtonStyle");
-            NextButton.Style = (Style)FindResource("OverlayDarkButtonStyle");
+            PrevButton.Style = (Style)FindResource("TacticalDarkButton");
+            NextButton.Style = (Style)FindResource("TacticalDarkButton");
 
             if (_viewModel.TotalOrders <= 0)
                 return;
 
             if (_viewModel.CurrentOrderIndex == 0)
-                PrevButton.Style = (Style)FindResource("OverlayGoldButtonStyle");
+                PrevButton.Style = (Style)FindResource("TacticalGoldButton");
 
             if (_viewModel.CurrentOrderIndex == _viewModel.TotalOrders - 1)
-                NextButton.Style = (Style)FindResource("OverlayGoldButtonStyle");
+                NextButton.Style = (Style)FindResource("TacticalGoldButton");
         }
 
         private void OnMinimize_Click(object? sender, RoutedEventArgs? e)
@@ -407,6 +426,32 @@ namespace BMS.Overlay
             ApplyPosition();
         }
 
+        private void OnNotepad_Click(object sender, RoutedEventArgs e)
+        {
+            if (_notepadWindow == null || !_notepadWindow.IsLoaded)
+            {
+                _notepadWindow = new NotepadWindow(_notepadService, _sharedNotepadService, _signalRService, _settingsService)
+                {
+                    Left = Left + Width + 10,
+                    Top = Top
+                };
+                _notepadWindow.Closed += (_, _) => _notepadWindow = null;
+                _notepadWindow.Show();
+            }
+            else
+            {
+                if (_notepadWindow.Visibility == Visibility.Visible)
+                {
+                    _notepadWindow.Activate();
+                }
+                else
+                {
+                    _notepadWindow.Show();
+                    _notepadWindow.Activate();
+                }
+            }
+        }
+
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _robloxCheckTimer?.Stop();
@@ -415,27 +460,52 @@ namespace BMS.Overlay
             if (_viewModel != null)
                 _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
 
+            // Close notepad window if open
+            if (_notepadWindow != null && _notepadWindow.IsLoaded)
+            {
+                _notepadWindow.Close();
+            }
+
             await _signalRService.DisposeAsync();
         }
 
         /// <summary>
-        /// Register (or re-register) the toggle overlay key on the keyboard hook.
+        /// Re-register ALL keybinds from current settings on the keyboard hook.
         /// </summary>
-        public void RegisterToggleKey(string keyName)
+        public void RegisterAllKeybinds()
         {
             if (_keyboardHookService == null) return;
 
             _keyboardHookService.UnregisterAll();
 
-            if (Enum.TryParse<Key>(keyName, true, out var key))
+            var settings = _settingsService.GetSettings();
+
+            void TryRegister(string keyName, Action handler)
             {
-                _keyboardHookService.Register(key, () => ToggleVisibility());
-                System.Diagnostics.Debug.WriteLine($"[Overlay] Toggle key set to: {key}");
+                if (Enum.TryParse<Key>(keyName, true, out var k))
+                    _keyboardHookService.Register(k, handler);
+                else
+                    System.Diagnostics.Debug.WriteLine($"[Overlay] Invalid key name: {keyName}");
             }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"[Overlay] Invalid toggle key name: {keyName}");
-            }
+
+            TryRegister(settings.KeyPrevious, () => OnPrev_Click(null, null));
+            TryRegister(settings.KeyNext, () => OnNext_Click(null, null));
+            TryRegister(settings.KeyMinimize, () => OnMinimize_Click(null, null));
+            // Only register restore if it's a different key from minimize
+            if (!string.Equals(settings.KeyRestore, settings.KeyMinimize, StringComparison.OrdinalIgnoreCase))
+                TryRegister(settings.KeyRestore, () => OnRestore_Click(null!, null!));
+            TryRegister(settings.KeyToggleOverlay, () => ToggleVisibility());
+
+            System.Diagnostics.Debug.WriteLine($"[Overlay] All keybinds registered (prev={settings.KeyPrevious}, next={settings.KeyNext}, min={settings.KeyMinimize}, restore={settings.KeyRestore}, toggle={settings.KeyToggleOverlay})");
+        }
+
+        /// <summary>
+        /// Register (or re-register) the toggle overlay key on the keyboard hook.
+        /// Kept for backwards compatibility — now delegates to RegisterAllKeybinds.
+        /// </summary>
+        public void RegisterToggleKey(string keyName)
+        {
+            RegisterAllKeybinds();
         }
     }
 }

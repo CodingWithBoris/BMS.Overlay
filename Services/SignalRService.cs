@@ -10,6 +10,7 @@ namespace BMS.Overlay.Services
         private readonly string _hubUrl;
 
         public event Action<string, string, string>? OnOrdersUpdated; // factionId, orderId, action
+        public event Action<string, DateTime>? OnSharedNotepadUpdated; // rtfContent, updatedAt
 
         public SignalRService(string baseApiUrl)
         {
@@ -47,6 +48,21 @@ namespace BMS.Overlay.Services
                         Debug.WriteLine($"SignalR: Error parsing OrdersUpdated: {ex.Message}");
                         // Still trigger a refresh even if parsing fails
                         OnOrdersUpdated?.Invoke("", "", "unknown");
+                    }
+                });
+
+                _connection.On<dynamic>("SharedNotepadUpdated", (data) =>
+                {
+                    try
+                    {
+                        string content = data.GetProperty("content").GetString() ?? "";
+                        DateTime updatedAt = data.GetProperty("updatedAt").GetDateTime();
+                        Debug.WriteLine($"SignalR: Received SharedNotepadUpdated - updatedAt={updatedAt}");
+                        OnSharedNotepadUpdated?.Invoke(content, updatedAt);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"SignalR: Error parsing SharedNotepadUpdated: {ex.Message}");
                     }
                 });
 
@@ -107,6 +123,40 @@ namespace BMS.Overlay.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"SignalR: Error subscribing to faction: {ex.Message}");
+            }
+        }
+
+        public async Task SubscribeToSharedNotepadAsync(string notepadId)
+        {
+            if (_connection?.State != HubConnectionState.Connected)
+            {
+                Debug.WriteLine("SignalR: Cannot subscribe to shared notepad - not connected");
+                return;
+            }
+
+            try
+            {
+                await _connection.InvokeAsync("SubscribeToSharedNotepad", notepadId);
+                Debug.WriteLine($"SignalR: Subscribed to shared notepad {notepadId}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SignalR: Error subscribing to shared notepad: {ex.Message}");
+            }
+        }
+
+        public async Task UnsubscribeFromSharedNotepadAsync(string notepadId)
+        {
+            if (_connection?.State != HubConnectionState.Connected) return;
+
+            try
+            {
+                await _connection.InvokeAsync("UnsubscribeFromSharedNotepad", notepadId);
+                Debug.WriteLine($"SignalR: Unsubscribed from shared notepad {notepadId}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SignalR: Error unsubscribing from shared notepad: {ex.Message}");
             }
         }
 

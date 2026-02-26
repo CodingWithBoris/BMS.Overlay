@@ -1,20 +1,20 @@
 ﻿BMS.Overlay
-
+1.0.0.0
 
 winexe
 C#
 .cs
-C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Debug\net8.0-windows\
+C:\GIT\Private Projects\bms\bms.overlay\obj\Debug\net8.0-windows\
 BMS.Overlay
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-C:\GIT\Private Projects\BMS\BMS.Overlay\App.xaml
-4-1897016666
+C:\GIT\Private Projects\bms\bms.overlay\App.xaml
+5-95132307
 
-12546480640
-214-1640863451
-MainWindow.xaml;Views\BmsOptionsView.xaml;Views\BmsTabView.xaml;Views\PasswordPromptWindow.xaml;
+16-952030735
+214238341004
+MainWindow.xaml;Views\BmsOptionsView.xaml;Views\BmsTabView.xaml;Views\NotepadWindow.xaml;Views\PasswordPromptWindow.xaml;
 
 False
 

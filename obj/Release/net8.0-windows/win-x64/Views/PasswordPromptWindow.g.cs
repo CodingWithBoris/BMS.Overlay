@@ -75,7 +75,7 @@ namespace BMS.Overlay.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/BMS.Overlay;component/views/passwordpromptwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/BMS.Overlay;V1.0.0.0;component/views/passwordpromptwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\..\Views\PasswordPromptWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

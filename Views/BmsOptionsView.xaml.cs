@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using BMS.Overlay.ViewModels;
 
 namespace BMS.Overlay.Views
@@ -9,13 +10,33 @@ namespace BMS.Overlay.Views
         private bool _isInitializing = true;
         private bool _isProgrammaticSelectionChange;
         private string? _lastAuthenticatedFactionId;
-        private bool _isCapturingToggleKey;
+
+        // Keybind capture state
+        private Border? _activeKeybindBorder;
+        private string? _activeKeybindSetting;
+
+        // Keybind button -> TextBlock lookup
+        private readonly Dictionary<string, TextBlock> _keybindTextBlocks = new();
+        private readonly Dictionary<string, Border> _keybindBorders = new();
 
         public BmsOptionsView()
         {
             InitializeComponent();
             Loaded += (s, e) =>
             {
+                // Build lookup tables
+                _keybindTextBlocks["KeyPrevious"] = KeyPrevText;
+                _keybindTextBlocks["KeyNext"] = KeyNextText;
+                _keybindTextBlocks["KeyMinimize"] = KeyMinimizeText;
+                _keybindTextBlocks["KeyRestore"] = KeyRestoreText;
+                _keybindTextBlocks["KeyToggleOverlay"] = KeyToggleText;
+
+                _keybindBorders["KeyPrevious"] = KeyPrevBorder;
+                _keybindBorders["KeyNext"] = KeyNextBorder;
+                _keybindBorders["KeyMinimize"] = KeyMinimizeBorder;
+                _keybindBorders["KeyRestore"] = KeyRestoreBorder;
+                _keybindBorders["KeyToggleOverlay"] = KeyToggleBorder;
+
                 if (DataContext is MainViewModel vm)
                 {
                     if (!string.IsNullOrWhiteSpace(vm.SelectedFactionId) &&
@@ -24,9 +45,13 @@ namespace BMS.Overlay.Views
                         _lastAuthenticatedFactionId = vm.SelectedFactionId;
                     }
 
-                    // Load current toggle key from settings
+                    // Load all keybind values from settings
                     var settings = vm.GetSettings();
-                    KeyToggleBox.Text = settings.KeyToggleOverlay;
+                    KeyPrevText.Text = FormatKeyName(settings.KeyPrevious);
+                    KeyNextText.Text = FormatKeyName(settings.KeyNext);
+                    KeyMinimizeText.Text = FormatKeyName(settings.KeyMinimize);
+                    KeyRestoreText.Text = FormatKeyName(settings.KeyRestore);
+                    KeyToggleText.Text = FormatKeyName(settings.KeyToggleOverlay);
 
                     // Load current overlay width
                     WidthInput.Text = $"{settings.OverlayWidth:0}";
@@ -36,34 +61,106 @@ namespace BMS.Overlay.Views
                 }
 
                 _isInitializing = false;
+
+                // Capture key events at page level for keybind capture
+                PreviewKeyDown += BmsOptionsView_PreviewKeyDown;
+                PreviewMouseDown += BmsOptionsView_PreviewMouseDown;
             };
         }
 
-        private void KeyToggleBox_GotFocus(object sender, System.Windows.RoutedEventArgs e)
+        /// <summary>
+        /// Convert a Key enum name to a human-readable uppercase display string.
+        /// </summary>
+        private static string FormatKeyName(string keyName)
         {
-            _isCapturingToggleKey = true;
-            KeyToggleBox.Text = "Press a key...";
-        }
-
-        private void KeyToggleBox_LostFocus(object sender, System.Windows.RoutedEventArgs e)
-        {
-            _isCapturingToggleKey = false;
-            // If user clicked away without pressing a key, restore current value
-            if (KeyToggleBox.Text == "Press a key..." && DataContext is MainViewModel vm)
+            return keyName switch
             {
-                var settings = vm.GetSettings();
-                KeyToggleBox.Text = settings.KeyToggleOverlay;
-            }
+                "Left" => "LEFT ARROW",
+                "Right" => "RIGHT ARROW",
+                "Up" => "UP ARROW",
+                "Down" => "DOWN ARROW",
+                "OemQuestion" => "SLASH",
+                "OemPeriod" => "PERIOD",
+                "OemComma" => "COMMA",
+                "OemMinus" => "MINUS",
+                "OemPlus" => "PLUS",
+                "OemTilde" => "TILDE",
+                "OemOpenBrackets" => "LEFTBRACKET",
+                "Oem6" => "RIGHTBRACKET",
+                "OemPipe" => "BACKSLASH",
+                "OemSemicolon" => "SEMICOLON",
+                "OemQuotes" => "QUOTE",
+                "Back" => "BACKSPACE",
+                "Return" => "ENTER",
+                "Capital" => "CAPSLOCK",
+                "LeftShift" => "LEFTSHIFT",
+                "RightShift" => "RIGHTSHIFT",
+                "LeftCtrl" => "LEFTCONTROL",
+                "RightCtrl" => "RIGHTCONTROL",
+                "LeftAlt" => "LEFTALT",
+                "RightAlt" => "RIGHTALT",
+                "Space" => "SPACE",
+                "Next" => "PAGEDOWN",
+                "Prior" => "PAGEUP",
+                _ => keyName.ToUpperInvariant()
+            };
         }
 
-        private void KeyToggleBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        /// <summary>
+        /// Clicked on any keybind button — start capturing.
+        /// </summary>
+        private void KeybindButton_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (!_isCapturingToggleKey) return;
+            if (sender is not Border border) return;
+            var settingName = border.Tag as string;
+            if (string.IsNullOrEmpty(settingName)) return;
+
+            // If we're already capturing this one, cancel
+            if (_activeKeybindBorder == border)
+            {
+                CancelKeybindCapture();
+                return;
+            }
+
+            // Cancel any previous capture
+            CancelKeybindCapture();
+
+            _activeKeybindBorder = border;
+            _activeKeybindSetting = settingName;
+
+            // Highlight the active button
+            border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#CCCCCC"));
+            if (_keybindTextBlocks.TryGetValue(settingName, out var tb))
+            {
+                tb.Text = "PRESS A KEY...";
+                tb.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
+            }
+
+            // Grab keyboard focus so we get key events
+            Focusable = true;
+            Focus();
+            Keyboard.Focus(this);
 
             e.Handled = true;
-            _isCapturingToggleKey = false;
+        }
+
+        /// <summary>
+        /// Key pressed while capturing a keybind.
+        /// </summary>
+        private void BmsOptionsView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (_activeKeybindBorder == null || _activeKeybindSetting == null) return;
+
+            e.Handled = true;
 
             var key = e.Key == Key.System ? e.SystemKey : e.Key;
+
+            // Escape cancels capture
+            if (key == Key.Escape)
+            {
+                CancelKeybindCapture();
+                return;
+            }
 
             // Don't allow modifier-only keys
             if (key == Key.LeftShift || key == Key.RightShift ||
@@ -72,15 +169,76 @@ namespace BMS.Overlay.Views
                 key == Key.LWin || key == Key.RWin)
                 return;
 
-            KeyToggleBox.Text = key.ToString();
+            var keyName = key.ToString();
+            var settingName = _activeKeybindSetting;
 
-            if (DataContext is MainViewModel vm)
+            // Update the text display
+            if (_keybindTextBlocks.TryGetValue(settingName, out var tb))
             {
-                vm.UpdateToggleKey(key.ToString());
+                tb.Text = FormatKeyName(keyName);
+                tb.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#A0A0A0"));
             }
 
-            // Move focus away
-            FactionCombo.Focus();
+            // Reset border style
+            if (_keybindBorders.TryGetValue(settingName, out var border))
+            {
+                border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A2A2A"));
+            }
+
+            _activeKeybindBorder = null;
+            _activeKeybindSetting = null;
+
+            // Save the keybind
+            if (DataContext is MainViewModel vm)
+            {
+                vm.UpdateKeybind(settingName, keyName);
+            }
+        }
+
+        /// <summary>
+        /// Mouse click outside the active keybind button cancels capture.
+        /// </summary>
+        private void BmsOptionsView_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_activeKeybindBorder == null) return;
+
+            // Check if the click is on the active border — if so, let KeybindButton_Click handle it
+            if (_activeKeybindBorder.IsMouseOver) return;
+
+            CancelKeybindCapture();
+        }
+
+        private void CancelKeybindCapture()
+        {
+            if (_activeKeybindBorder == null || _activeKeybindSetting == null) return;
+
+            var settingName = _activeKeybindSetting;
+
+            // Restore text from settings
+            if (DataContext is MainViewModel vm && _keybindTextBlocks.TryGetValue(settingName, out var tb))
+            {
+                var settings = vm.GetSettings();
+                var currentKey = settingName switch
+                {
+                    "KeyPrevious" => settings.KeyPrevious,
+                    "KeyNext" => settings.KeyNext,
+                    "KeyMinimize" => settings.KeyMinimize,
+                    "KeyRestore" => settings.KeyRestore,
+                    "KeyToggleOverlay" => settings.KeyToggleOverlay,
+                    _ => ""
+                };
+                tb.Text = FormatKeyName(currentKey);
+                tb.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#A0A0A0"));
+            }
+
+            // Reset border style
+            if (_keybindBorders.TryGetValue(settingName, out var border))
+            {
+                border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A2A2A"));
+            }
+
+            _activeKeybindBorder = null;
+            _activeKeybindSetting = null;
         }
 
         private void WidthApplyButton_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -138,25 +296,26 @@ namespace BMS.Overlay.Views
 
         private void ApplyJtacVisuals(bool jtacOn)
         {
-            var goldBorder = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D4AF37"));
-            var goldText = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#E3C341"));
+            var activeBorder = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D4880A"));
+            var activeText = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFB300"));
             var dimBorder = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2E3A46"));
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2A2A2A"));
             var dimText = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7A8290"));
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#6A6A6A"));
             var activeBg = new System.Windows.Media.SolidColorBrush(
-                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2A2315"));
-            var inactiveBg = System.Windows.Media.Brushes.Transparent;
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A0A0A"));
+            var inactiveBg = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A0A0A"));
 
-            JtacOnBorder.BorderBrush = jtacOn ? goldBorder : dimBorder;
+            JtacOnBorder.BorderBrush = jtacOn ? activeBorder : dimBorder;
             JtacOnBorder.Background = jtacOn ? activeBg : inactiveBg;
-            JtacOnText.Foreground = jtacOn ? goldText : dimText;
+            JtacOnText.Foreground = jtacOn ? activeText : dimText;
 
-            JtacOffBorder.BorderBrush = !jtacOn ? goldBorder : dimBorder;
+            JtacOffBorder.BorderBrush = !jtacOn ? activeBorder : dimBorder;
             JtacOffBorder.Background = !jtacOn ? activeBg : inactiveBg;
-            JtacOffText.Foreground = !jtacOn ? goldText : dimText;
+            JtacOffText.Foreground = !jtacOn ? activeText : dimText;
         }
 
         private async void FactionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -10,11 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("BMS.Overlay")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("BMS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("BMS Overlay - BETA 1.0.0")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+642c22a421c56169ac8b099de6f4963e7f573d74")]
-[assembly: System.Reflection.AssemblyProductAttribute("BMS.Overlay")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("BETA 1.0.0+a3fda49cb5dc131846c70cb5eb988a19f06e397b")]
+[assembly: System.Reflection.AssemblyProductAttribute("BMS Overlay")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BMS.Overlay")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]

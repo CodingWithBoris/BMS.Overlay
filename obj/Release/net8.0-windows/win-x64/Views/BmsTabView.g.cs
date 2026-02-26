@@ -91,7 +91,7 @@ namespace BMS.Overlay.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/BMS.Overlay;component/views/bmstabview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/BMS.Overlay;V1.0.0.0;component/views/bmstabview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\..\Views\BmsTabView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

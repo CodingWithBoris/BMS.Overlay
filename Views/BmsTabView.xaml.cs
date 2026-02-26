@@ -89,10 +89,10 @@ namespace BMS.Overlay.Views
 
                 var titleText = new TextBlock
                 {
-                    Text = section.Title,
+                    Text = section.Title?.ToUpperInvariant() ?? "",
                     FontSize = 13,
                     FontWeight = FontWeights.Bold,
-                    Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xD7, 0x00)),
+                    Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xFF)),
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 8, 0),
                 };
@@ -102,10 +102,10 @@ namespace BMS.Overlay.Views
                 var line = new Border
                 {
                     Height = 1,
-                    Background = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55)),
+                    Background = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A)),
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 12, 0),
-                    CornerRadius = new CornerRadius(1),
+                    CornerRadius = new CornerRadius(0),
                 };
                 titleRow.Children.Add(line);
 
@@ -141,16 +141,16 @@ namespace BMS.Overlay.Views
 
             var border = new Border
             {
-                BorderBrush = new SolidColorBrush(Color.FromRgb(0x26, 0x30, 0x3A)),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A)),
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(4),
-                Background = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x00, 0x00)),
+                CornerRadius = new CornerRadius(0),
+                Background = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A)),
             };
 
             var rtb = new RichTextBox
             {
                 FontSize = 12,
-                Foreground = Brushes.White,
+                Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8)),
                 Background = Brushes.Transparent,
                 IsReadOnly = true,
                 BorderThickness = new Thickness(0),
@@ -195,10 +195,10 @@ namespace BMS.Overlay.Views
                 };
                 var border = new Border
                 {
-                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x26, 0x30, 0x3A)),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A)),
                     BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(4),
-                    Background = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x00, 0x00)),
+                    CornerRadius = new CornerRadius(0),
+                    Background = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A)),
                     Padding = new Thickness(6),
                     Child = image,
                 };
@@ -210,7 +210,7 @@ namespace BMS.Overlay.Views
                 parent.Children.Add(new TextBlock
                 {
                     Text = $"[Image: {section.ImageUrl}]",
-                    Foreground = Brushes.Gray,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A)),
                     FontStyle = FontStyles.Italic,
                 });
             }
@@ -256,10 +256,10 @@ namespace BMS.Overlay.Views
 
                 var border = new Border
                 {
-                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x26, 0x30, 0x3A)),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A)),
                     BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(4),
-                    Background = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x00, 0x00)),
+                    CornerRadius = new CornerRadius(0),
+                    Background = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A)),
                     Padding = new Thickness(6),
                     Child = image,
                 };
@@ -271,7 +271,7 @@ namespace BMS.Overlay.Views
                 parent.Children.Add(new TextBlock
                 {
                     Text = $"[GIF: {url}]",
-                    Foreground = Brushes.Gray,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A)),
                     FontStyle = FontStyles.Italic,
                 });
             }
@@ -294,10 +294,10 @@ namespace BMS.Overlay.Views
 
                 var border = new Border
                 {
-                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x26, 0x30, 0x3A)),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A)),
                     BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(4),
-                    Background = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x00, 0x00)),
+                    CornerRadius = new CornerRadius(0),
+                    Background = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A)),
                     Padding = new Thickness(6),
                     Child = mediaElement,
                 };
@@ -323,7 +323,7 @@ namespace BMS.Overlay.Views
                         border.Child = new TextBlock
                         {
                             Text = $"[Video failed to load: {url}]",
-                            Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0x66, 0x66)),
+                            Foreground = new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)),
                             FontStyle = FontStyles.Italic,
                             TextWrapping = TextWrapping.Wrap,
                             Padding = new Thickness(4),
@@ -340,7 +340,7 @@ namespace BMS.Overlay.Views
                 parent.Children.Add(new TextBlock
                 {
                     Text = $"[Video: {url}]",
-                    Foreground = Brushes.Gray,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A)),
                     FontStyle = FontStyles.Italic,
                 });
             }
@@ -363,16 +363,16 @@ namespace BMS.Overlay.Views
                 // Background bar
                 var barBg = new Border
                 {
-                    Background = new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x00, 0x00)),
-                    CornerRadius = new CornerRadius(4),
+                    Background = new SolidColorBrush(Color.FromRgb(0x0D, 0x0D, 0x0D)),
+                    CornerRadius = new CornerRadius(0),
                 };
                 optionRow.Children.Add(barBg);
 
                 // Fill bar
                 var barFill = new Border
                 {
-                    Background = new SolidColorBrush(Color.FromArgb(0x66, 0xD4, 0xAF, 0x37)),
-                    CornerRadius = new CornerRadius(4),
+                    Background = new SolidColorBrush(Color.FromArgb(0x55, 0xFF, 0xB3, 0x00)),
+                    CornerRadius = new CornerRadius(0),
                     HorizontalAlignment = HorizontalAlignment.Left,
                     Width = 0, // Will be set on render
                 };
@@ -383,7 +383,7 @@ namespace BMS.Overlay.Views
                 var voteLabel = new TextBlock
                 {
                     Text = $"{option.VoteCount} ({pct:P0})",
-                    Foreground = new SolidColorBrush(Color.FromRgb(0xAA, 0xAA, 0xAA)),
+                    Foreground = new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)),
                     FontSize = 11,
                     VerticalAlignment = VerticalAlignment.Center,
                 };
@@ -392,8 +392,8 @@ namespace BMS.Overlay.Views
 
                 var optionText = new TextBlock
                 {
-                    Text = option.Text,
-                    Foreground = Brushes.White,
+                    Text = option.Text?.ToUpperInvariant() ?? "",
+                    Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8)),
                     FontSize = 12,
                     VerticalAlignment = VerticalAlignment.Center,
                 };
@@ -412,13 +412,13 @@ namespace BMS.Overlay.Views
                 optionRow.Cursor = isOptionLocked ? System.Windows.Input.Cursors.Arrow : System.Windows.Input.Cursors.Hand;
                 if (isOptionLocked)
                 {
-                    barBg.Background = new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x00, 0x00));
+                    barBg.Background = new SolidColorBrush(Color.FromRgb(0x0D, 0x0D, 0x0D));
                     optionRow.Opacity = 0.85;
                 }
                 else
                 {
-                    optionRow.MouseEnter += (s, e) => barBg.Background = new SolidColorBrush(Color.FromArgb(0x66, 0x00, 0x00, 0x00));
-                    optionRow.MouseLeave += (s, e) => barBg.Background = new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x00, 0x00));
+                    optionRow.MouseEnter += (s, e) => barBg.Background = new SolidColorBrush(Color.FromRgb(0x14, 0x14, 0x14));
+                    optionRow.MouseLeave += (s, e) => barBg.Background = new SolidColorBrush(Color.FromRgb(0x0D, 0x0D, 0x0D));
                 }
 
                 var capturedOption = option;
@@ -447,8 +447,8 @@ namespace BMS.Overlay.Views
             // Total votes label
             pollPanel.Children.Add(new TextBlock
             {
-                Text = $"{totalVotes} total vote{(totalVotes != 1 ? "s" : "")}",
-                Foreground = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88)),
+                Text = $"{totalVotes} TOTAL VOTE{(totalVotes != 1 ? "S" : "")}",
+                Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A)),
                 FontSize = 10,
                 Margin = new Thickness(0, 4, 0, 0),
             });
@@ -512,12 +512,12 @@ namespace BMS.Overlay.Views
             if (isChecked)
             {
                 textBlock.TextDecorations = TextDecorations.Strikethrough;
-                textBlock.Foreground = new SolidColorBrush(Color.FromArgb(0x80, 0xFF, 0xFF, 0xFF)); // 50% opacity white
+                textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A));
             }
             else
             {
                 textBlock.TextDecorations = null;
-                textBlock.Foreground = Brushes.White;
+                textBlock.Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8));
             }
         }
 
@@ -530,8 +530,8 @@ namespace BMS.Overlay.Views
                 if (string.IsNullOrEmpty(xamlContent))
                 {
                     OrderContent.Document = new FlowDocument(
-                        new Paragraph(new Run("Select a faction from BMS Options to view orders"))
-                        { Foreground = Brushes.Gray });
+                        new Paragraph(new Run("SELECT A FACTION FROM BMS OPTIONS TO VIEW ORDERS"))
+                        { Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A)) });
                     SetDocumentStyle(OrderContent.Document);
                     return;
                 }
@@ -563,7 +563,7 @@ namespace BMS.Overlay.Views
 
         private static void SetDocumentStyle(FlowDocument doc)
         {
-            doc.Foreground = Brushes.White;
+            doc.Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8));
             doc.Background = Brushes.Transparent;
             doc.PagePadding = new Thickness(10);
             doc.FontSize = 12;
