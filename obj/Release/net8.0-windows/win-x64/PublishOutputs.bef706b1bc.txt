@@ -1,0 +1,8 @@
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\BMS.Overlay.pdb
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\Templates\AfterActionReport.md
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\Templates\EmergencyExvil.txt
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\Templates\HLZBrief.md
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\Templates\HLZBrief.txt
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\Templates\OperationBrief.txt
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\BMS.Shared.pdb
+C:\GIT\Private Projects\BMS\publish\dist\BMS.Overlay\BMS.Overlay.exe

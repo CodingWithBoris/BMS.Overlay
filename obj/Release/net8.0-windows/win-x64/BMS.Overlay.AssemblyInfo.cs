@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("BMS Overlay - BETA 1.0.0")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("BETA 1.0.0+a3fda49cb5dc131846c70cb5eb988a19f06e397b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("BETA 1.0.0+d1d4aca6218f9e0a231f01b736da209a87b001b1")]
 [assembly: System.Reflection.AssemblyProductAttribute("BMS Overlay")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BMS.Overlay")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

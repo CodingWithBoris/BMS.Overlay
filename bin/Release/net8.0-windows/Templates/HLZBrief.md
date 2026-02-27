@@ -1,0 +1,20 @@
+\[FORM]
+
+\_\_ THIS IS \_\_. LZ BRIEF, MY POSITION \_\_.
+
+HLZ MARKED BY \_\_
+
+HAZARDS ARE LISTED AS \_\_\_
+
+FRIENDLIES MARKED \_\_\_
+
+ENEMIES ARE \_\_\_
+
+ADDITIONAL REMARKS ARE
+
+\_\_\_\_
+
+
+
+
+

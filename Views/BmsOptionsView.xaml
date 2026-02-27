@@ -130,13 +130,14 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
                         <TextBlock Grid.Column="0" Text="FACTION" Style="{StaticResource SettingLabelStyle}"/>
                         <ComboBox x:Name="FactionCombo" Grid.Column="1"
                                   ItemsSource="{Binding Factions}"
                                   DisplayMemberPath="Title"
                                   SelectedValuePath="Id"
                                   SelectedValue="{Binding SelectedFactionId}"
+                                  IsEditable="True"
+                                  IsTextSearchEnabled="False"
                                   SelectionChanged="FactionCombo_SelectionChanged"/>
                     </Grid>
                 </Border>
@@ -269,7 +270,30 @@
                     </Grid>
                 </Border>
 
-                <Border Style="{StaticResource KeybindRowAltStyle}" Margin="0,0,0,16">
+                <Border Style="{StaticResource KeybindRowAltStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="FONT SIZE" Style="{StaticResource KeybindLabelStyle}"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBox x:Name="FontSizeInput"
+                                     Style="{StaticResource ReadableTextBox}"
+                                     MinWidth="80" MaxWidth="100" TextAlignment="Center"
+                                     PreviewTextInput="FontSizeInput_PreviewTextInput"
+                                     PreviewKeyDown="FontSizeInput_PreviewKeyDown"/>
+                            <Border x:Name="FontSizeApplyButton" Margin="4,0,0,0" Padding="8,5"
+                                    Background="#0A0A0A" BorderBrush="#2A2A2A" BorderThickness="1"
+                                    Cursor="Hand" MouseLeftButtonUp="FontSizeApplyButton_Click">
+                                <TextBlock Text="&#x2713;" FontSize="14" FontWeight="Bold"
+                                           Foreground="#D8D8D8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource KeybindRowStyle}" Margin="0,0,0,16">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>

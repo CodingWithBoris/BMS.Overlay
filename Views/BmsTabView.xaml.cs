@@ -32,7 +32,8 @@ namespace BMS.Overlay.Views
 
         private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(MainViewModel.CurrentOrder))
+            if (e.PropertyName == nameof(MainViewModel.CurrentOrder) ||
+                e.PropertyName == nameof(MainViewModel.ContentFontSize))
             {
                 var vm = DataContext as MainViewModel;
                 Dispatcher.Invoke(() => RenderOrder(vm?.CurrentOrder));
@@ -60,25 +61,27 @@ namespace BMS.Overlay.Views
 
             NoOrdersPanel.Visibility = Visibility.Collapsed;
 
+            var fontSize = (DataContext as MainViewModel)?.ContentFontSize ?? 12;
+
             // If order has sections, render them
             if (order.Sections != null && order.Sections.Count > 0)
             {
                 foreach (var section in order.Sections.OrderBy(s => s.Index))
                 {
-                    RenderSection(section, order);
+                    RenderSection(section, order, fontSize);
                 }
             }
             else if (!string.IsNullOrEmpty(order.Content))
             {
                 // Legacy: render flat content
                 LegacyContentBorder.Visibility = Visibility.Visible;
-                LoadLegacyContent(order.Content);
+                LoadLegacyContent(order.Content, fontSize);
             }
         }
 
         // ──── Section Rendering ───────────────────────────────────────
 
-        private void RenderSection(OrderSection section, BmsOrder order)
+        private void RenderSection(OrderSection section, BmsOrder order, double fontSize)
         {
             var container = new StackPanel { Margin = new Thickness(0, 0, 0, 12) };
 
@@ -90,7 +93,7 @@ namespace BMS.Overlay.Views
                 var titleText = new TextBlock
                 {
                     Text = section.Title?.ToUpperInvariant() ?? "",
-                    FontSize = 13,
+                    FontSize = fontSize + 1,
                     FontWeight = FontWeights.Bold,
                     Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xFF)),
                     VerticalAlignment = VerticalAlignment.Center,
@@ -116,7 +119,7 @@ namespace BMS.Overlay.Views
             switch (section.Type)
             {
                 case "text":
-                    RenderTextSection(container, section);
+                    RenderTextSection(container, section, fontSize);
                     break;
                 case "image":
                     RenderImageSection(container, section);
@@ -125,17 +128,17 @@ namespace BMS.Overlay.Views
                     RenderVideoSection(container, section);
                     break;
                 case "poll":
-                    RenderPollSection(container, section, order);
+                    RenderPollSection(container, section, order, fontSize);
                     break;
                 case "checklist":
-                    RenderChecklistSection(container, section, order);
+                    RenderChecklistSection(container, section, order, fontSize);
                     break;
             }
 
             SectionsPanel.Children.Add(container);
         }
 
-        private void RenderTextSection(StackPanel parent, OrderSection section)
+        private void RenderTextSection(StackPanel parent, OrderSection section, double fontSize)
         {
             if (string.IsNullOrEmpty(section.Content)) return;
 
@@ -149,7 +152,7 @@ namespace BMS.Overlay.Views
 
             var rtb = new RichTextBox
             {
-                FontSize = 12,
+                FontSize = fontSize,
                 Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8)),
                 Background = Brushes.Transparent,
                 IsReadOnly = true,
@@ -165,13 +168,13 @@ namespace BMS.Overlay.Views
                 var range = new TextRange(doc.ContentStart, doc.ContentEnd);
                 using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(section.Content));
                 range.Load(stream, DataFormats.Xaml);
-                SetDocumentStyle(doc);
+                SetDocumentStyle(doc, fontSize);
                 rtb.Document = doc;
             }
             catch
             {
                 var doc = new FlowDocument(new Paragraph(new Run(section.Content)));
-                SetDocumentStyle(doc);
+                SetDocumentStyle(doc, fontSize);
                 rtb.Document = doc;
             }
 
@@ -346,7 +349,7 @@ namespace BMS.Overlay.Views
             }
         }
 
-        private void RenderPollSection(StackPanel parent, OrderSection section, BmsOrder order)
+        private void RenderPollSection(StackPanel parent, OrderSection section, BmsOrder order, double fontSize)
         {
             if (section.PollOptions == null || section.PollOptions.Count == 0) return;
 
@@ -384,7 +387,7 @@ namespace BMS.Overlay.Views
                 {
                     Text = $"{option.VoteCount} ({pct:P0})",
                     Foreground = new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)),
-                    FontSize = 11,
+                    FontSize = Math.Max(8, fontSize - 1),
                     VerticalAlignment = VerticalAlignment.Center,
                 };
                 DockPanel.SetDock(voteLabel, Dock.Right);
@@ -394,7 +397,7 @@ namespace BMS.Overlay.Views
                 {
                     Text = option.Text?.ToUpperInvariant() ?? "",
                     Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8)),
-                    FontSize = 12,
+                    FontSize = fontSize,
                     VerticalAlignment = VerticalAlignment.Center,
                 };
                 textPanel.Children.Add(optionText);
@@ -449,14 +452,14 @@ namespace BMS.Overlay.Views
             {
                 Text = $"{totalVotes} TOTAL VOTE{(totalVotes != 1 ? "S" : "")}",
                 Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A)),
-                FontSize = 10,
+                FontSize = Math.Max(8, fontSize - 2),
                 Margin = new Thickness(0, 4, 0, 0),
             });
 
             parent.Children.Add(pollPanel);
         }
 
-        private void RenderChecklistSection(StackPanel parent, OrderSection section, BmsOrder order)
+        private void RenderChecklistSection(StackPanel parent, OrderSection section, BmsOrder order, double fontSize)
         {
             if (section.ChecklistItems == null || section.ChecklistItems.Count == 0) return;
 
@@ -476,7 +479,7 @@ namespace BMS.Overlay.Views
                 var textBlock = new TextBlock
                 {
                     Text = item.Text,
-                    FontSize = 12,
+                    FontSize = fontSize,
                     VerticalAlignment = VerticalAlignment.Center,
                 };
 
@@ -523,7 +526,7 @@ namespace BMS.Overlay.Views
 
         // ──── Legacy Content ──────────────────────────────────────────
 
-        private void LoadLegacyContent(string? xamlContent)
+        private void LoadLegacyContent(string? xamlContent, double fontSize)
         {
             try
             {
@@ -532,7 +535,7 @@ namespace BMS.Overlay.Views
                     OrderContent.Document = new FlowDocument(
                         new Paragraph(new Run("SELECT A FACTION FROM BMS OPTIONS TO VIEW ORDERS"))
                         { Foreground = new SolidColorBrush(Color.FromRgb(0x6A, 0x6A, 0x6A)) });
-                    SetDocumentStyle(OrderContent.Document);
+                    SetDocumentStyle(OrderContent.Document, fontSize);
                     return;
                 }
 
@@ -542,13 +545,13 @@ namespace BMS.Overlay.Views
                     var range = new TextRange(doc.ContentStart, doc.ContentEnd);
                     using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(xamlContent));
                     range.Load(stream, DataFormats.Xaml);
-                    SetDocumentStyle(doc);
+                    SetDocumentStyle(doc, fontSize);
                     OrderContent.Document = doc;
                 }
                 catch
                 {
                     var doc = new FlowDocument(new Paragraph(new Run(xamlContent)));
-                    SetDocumentStyle(doc);
+                    SetDocumentStyle(doc, fontSize);
                     OrderContent.Document = doc;
                 }
             }
@@ -556,18 +559,48 @@ namespace BMS.Overlay.Views
             {
                 System.Diagnostics.Debug.WriteLine($"Error loading content: {ex.Message}");
                 var doc = new FlowDocument(new Paragraph(new Run(xamlContent ?? "Error loading content")));
-                SetDocumentStyle(doc);
+                SetDocumentStyle(doc, fontSize);
                 OrderContent.Document = doc;
             }
         }
 
-        private static void SetDocumentStyle(FlowDocument doc)
+        private static void SetDocumentStyle(FlowDocument doc, double fontSize)
         {
+            // Clear inline FontSize values saved by the RichTextBox editor so the
+            // document-level setting actually takes effect.
+            ClearDocumentFontSizes(doc);
+
             doc.Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8));
             doc.Background = Brushes.Transparent;
             doc.PagePadding = new Thickness(10);
-            doc.FontSize = 12;
+            doc.FontSize = fontSize;
             doc.FontFamily = new FontFamily("Segoe UI");
+        }
+
+        private static void ClearDocumentFontSizes(FlowDocument doc)
+        {
+            foreach (var block in doc.Blocks)
+                ClearBlockFontSize(block);
+        }
+
+        private static void ClearBlockFontSize(Block block)
+        {
+            block.ClearValue(TextElement.FontSizeProperty);
+            if (block is Paragraph para)
+                foreach (var inline in para.Inlines)
+                    ClearInlineFontSize(inline);
+            else if (block is List list)
+                foreach (var item in list.ListItems)
+                    foreach (var b in item.Blocks)
+                        ClearBlockFontSize(b);
+        }
+
+        private static void ClearInlineFontSize(Inline inline)
+        {
+            inline.ClearValue(TextElement.FontSizeProperty);
+            if (inline is Span span)
+                foreach (var child in span.Inlines)
+                    ClearInlineFontSize(child);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace BMS.Overlay.Views
         private bool _isInitializing = true;
         private bool _isProgrammaticSelectionChange;
         private string? _lastAuthenticatedFactionId;
+        private List<BMS.Shared.Models.FactionInfo> _allFactions = new();
 
         // Keybind capture state
         private Border? _activeKeybindBorder;
@@ -56,8 +57,27 @@ namespace BMS.Overlay.Views
                     // Load current overlay width
                     WidthInput.Text = $"{settings.OverlayWidth:0}";
 
+                    // Load current font size
+                    FontSizeInput.Text = $"{settings.OverlayFontSize:0}";
+
                     // Load JTAC mode
                     ApplyJtacVisuals(settings.JtacMode);
+
+                    // Cache factions and take control of ItemsSource for inline filtering
+                    _allFactions = vm.Factions.ToList();
+                    FactionCombo.ItemsSource = _allFactions;
+                    FactionCombo.AddHandler(
+                        System.Windows.Controls.Primitives.TextBoxBase.TextChangedEvent,
+                        new System.Windows.Controls.TextChangedEventHandler(OnFactionComboTextChanged));
+                    vm.PropertyChanged += (_, pe) =>
+                    {
+                        if (pe.PropertyName == nameof(vm.Factions))
+                            Dispatcher.Invoke(() =>
+                            {
+                                _allFactions = vm.Factions.ToList();
+                                FactionCombo.ItemsSource = _allFactions;
+                            });
+                    };
                 }
 
                 _isInitializing = false;
@@ -280,6 +300,43 @@ namespace BMS.Overlay.Views
             }
         }
 
+        private void FontSizeApplyButton_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ApplyFontSizeFromInput();
+        }
+
+        private void FontSizeInput_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ApplyFontSizeFromInput();
+                FactionCombo.Focus();
+                e.Handled = true;
+            }
+        }
+
+        private void FontSizeInput_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            e.Handled = !int.TryParse(e.Text, out _);
+        }
+
+        private void ApplyFontSizeFromInput()
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+
+            if (double.TryParse(FontSizeInput.Text, out var size))
+            {
+                size = Math.Clamp(size, 8, 24);
+                FontSizeInput.Text = $"{size:0}";
+                vm.UpdateOverlayFontSize(size);
+            }
+            else
+            {
+                var settings = vm.GetSettings();
+                FontSizeInput.Text = $"{settings.OverlayFontSize:0}";
+            }
+        }
+
         private void JtacOn_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (_isInitializing || DataContext is not MainViewModel vm) return;
@@ -316,6 +373,25 @@ namespace BMS.Overlay.Views
             JtacOffBorder.BorderBrush = !jtacOn ? activeBorder : dimBorder;
             JtacOffBorder.Background = !jtacOn ? activeBg : inactiveBg;
             JtacOffText.Foreground = !jtacOn ? activeText : dimText;
+        }
+
+        private void OnFactionComboTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            // When WPF sets text after item selection, text == selected item's title — restore full list and skip
+            var selectedTitle = (FactionCombo.SelectedItem as BMS.Shared.Models.FactionInfo)?.Title;
+            if (FactionCombo.Text == selectedTitle)
+            {
+                FactionCombo.ItemsSource = _allFactions;
+                return;
+            }
+
+            var query = FactionCombo.Text.Trim();
+            FactionCombo.ItemsSource = string.IsNullOrEmpty(query)
+                ? _allFactions
+                : _allFactions.Where(f => f.Title.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (!string.IsNullOrEmpty(query))
+                FactionCombo.IsDropDownOpen = true;
         }
 
         private async void FactionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

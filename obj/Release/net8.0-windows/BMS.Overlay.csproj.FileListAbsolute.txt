@@ -45,3 +45,6 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Templates\HLZ
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Templates\OperationBrief.txt
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\Views\NotepadWindow.baml
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\Views\NotepadWindow.g.cs
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\Templates\HLZBrief.md
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\BMS.Overlay_MarkupCompile.lref
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\App.baml

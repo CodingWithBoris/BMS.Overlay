@@ -304,6 +304,8 @@ namespace BMS.Overlay.ViewModels
         // ──────────────────────────────────────────
         public Settings GetSettings() => _settingsService.GetSettings();
 
+        public double ContentFontSize => _settingsService.GetSettings().OverlayFontSize;
+
         public void UpdateToggleKey(string keyName)
         {
             var settings = _settingsService.GetSettings();
@@ -356,6 +358,15 @@ namespace BMS.Overlay.ViewModels
                 mainWindow.Width = width;
                 mainWindow.MaxWidth = width;
             }
+        }
+
+        public void UpdateOverlayFontSize(double size)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.OverlayFontSize = size;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+            OnPropertyChanged(nameof(ContentFontSize));
         }
 
         public void UpdateJtacMode(bool enabled)

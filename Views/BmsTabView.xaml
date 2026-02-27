@@ -7,13 +7,13 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical" Margin="10" VerticalAlignment="Stretch">
                 <!-- Order Title -->
-                <TextBlock x:Name="OrderTitle" 
-                           FontSize="16" FontWeight="Bold" Foreground="#D8D8D8"
+                <TextBlock x:Name="OrderTitle"
+                           FontSize="{Binding ContentFontSize}" FontWeight="Bold" Foreground="#D8D8D8"
                            Text="{Binding CurrentOrder.Title, FallbackValue='WELCOME TO THE BMS'}"
                            Margin="0,0,0,6"/>
 
                 <!-- Order Index Counter -->
-                <TextBlock FontSize="12" Foreground="#6A6A6A" Margin="0,0,0,10">
+                <TextBlock FontSize="{Binding ContentFontSize}" Foreground="#6A6A6A" Margin="0,0,0,10">
                     <Run Text="ORDER "/>
                     <Run Text="{Binding CurrentOrderIndex, Mode=OneWay}"/>
                     <Run Text=" OF "/>

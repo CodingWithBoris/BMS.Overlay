@@ -40,6 +40,7 @@ namespace BMS.Overlay
         public MainWindow()
         {
             InitializeComponent();
+            Icon = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/app.ico"));
 
             _apiService = new ApiService(ApiBaseUrl);
             _signalRService = new SignalRService(ApiBaseUrl);
@@ -430,7 +431,7 @@ namespace BMS.Overlay
         {
             if (_notepadWindow == null || !_notepadWindow.IsLoaded)
             {
-                _notepadWindow = new NotepadWindow(_notepadService, _sharedNotepadService, _signalRService, _settingsService)
+                _notepadWindow = new NotepadWindow(_notepadService, _sharedNotepadService, _signalRService, _settingsService, _viewModel!)
                 {
                     Left = Left + Width + 10,
                     Top = Top

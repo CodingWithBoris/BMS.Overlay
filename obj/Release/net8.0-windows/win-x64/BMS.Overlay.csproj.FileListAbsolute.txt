@@ -508,3 +508,6 @@ C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Templ
 C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Templates\OperationBrief.txt
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\Views\NotepadWindow.baml
 C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\Views\NotepadWindow.g.cs
+C:\GIT\Private Projects\BMS\BMS.Overlay\bin\Release\net8.0-windows\win-x64\Templates\HLZBrief.md
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\BMS.Overlay_MarkupCompile.lref
+C:\GIT\Private Projects\BMS\BMS.Overlay\obj\Release\net8.0-windows\win-x64\App.baml

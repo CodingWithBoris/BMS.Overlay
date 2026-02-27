@@ -68,7 +68,8 @@ public class Settings
     public string KeyMinimize { get; set; } = "F9";
     public string KeyRestore { get; set; } = "F9";
     public string KeyToggleOverlay { get; set; } = "M";
-    public double OverlayWidth { get; set; } = 280;
+    public double OverlayWidth { get; set; } = 400;
+    public double OverlayFontSize { get; set; } = 12;
     public double OverlayOpacity { get; set; } = 0.8;
     public bool JtacMode { get; set; } = false;
 }

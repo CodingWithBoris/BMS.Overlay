@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using BMS.Overlay.Models;
 using BMS.Overlay.Services;
+using BMS.Overlay.ViewModels;
 
 namespace BMS.Overlay.Views;
 
@@ -22,6 +23,7 @@ public partial class NotepadWindow : Window
     private readonly SharedNotepadService _sharedService;
     private readonly SignalRService _signalRService;
     private readonly SettingsService _settingsService;
+    private readonly MainViewModel _viewModel;
 
     private NotepadNote? _currentNote;
     private bool _suppressTextChanged;
@@ -43,13 +45,14 @@ public partial class NotepadWindow : Window
     private static extern IntPtr GetForegroundWindow();
 
     public NotepadWindow(NotepadService notepadService, SharedNotepadService sharedService,
-        SignalRService signalRService, SettingsService settingsService)
+        SignalRService signalRService, SettingsService settingsService, MainViewModel viewModel)
     {
         InitializeComponent();
         _notepadService = notepadService;
         _sharedService = sharedService;
         _signalRService = signalRService;
         _settingsService = settingsService;
+        _viewModel = viewModel;
 
         // Local auto-save every 3 seconds when dirty
         _autoSaveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
@@ -923,14 +926,15 @@ public partial class NotepadWindow : Window
             return;
         }
 
-        var settings = _settingsService.GetSettings();
-        if (settings.SelectedFactionId == null)
+        var factionId = _viewModel.SelectedFactionId;
+        if (string.IsNullOrEmpty(factionId))
         {
             CreateErrorText.Text = "No faction selected. Go to Options and select a faction first.";
             CreateErrorText.Visibility = Visibility.Visible;
             return;
         }
-        if (settings.SelectedRoleId == null)
+        var roleId = _viewModel.SelectedRoleId;
+        if (string.IsNullOrEmpty(roleId))
         {
             CreateErrorText.Text = "No role selected. Go to Options and select a role first.";
             CreateErrorText.Visibility = Visibility.Visible;
@@ -940,8 +944,8 @@ public partial class NotepadWindow : Window
         CreateErrorText.Visibility = Visibility.Collapsed;
 
         var result = await _sharedService.JoinAsync(
-            settings.SelectedFactionId.Value.ToString(),
-            settings.SelectedRoleId.Value.ToString(),
+            factionId,
+            roleId,
             password);
 
         if (result == null)
@@ -982,13 +986,14 @@ public partial class NotepadWindow : Window
             return;
         }
 
-        var settings = _settingsService.GetSettings();
-        if (settings.SelectedFactionId == null)
+        var factionId = _viewModel.SelectedFactionId;
+        if (string.IsNullOrEmpty(factionId))
         {
             ShowSharedError("No faction selected. Go to Options and select a faction first.");
             return;
         }
-        if (settings.SelectedRoleId == null)
+        var roleId = _viewModel.SelectedRoleId;
+        if (string.IsNullOrEmpty(roleId))
         {
             ShowSharedError("No role selected. Go to Options and select a role first.");
             return;
@@ -998,8 +1003,8 @@ public partial class NotepadWindow : Window
         SavedIndicator.Text = "Joining...";
 
         var result = await _sharedService.JoinAsync(
-            settings.SelectedFactionId.Value.ToString(),
-            settings.SelectedRoleId.Value.ToString(),
+            factionId,
+            roleId,
             password);
 
         if (result == null)
