@@ -12,7 +12,7 @@
                 <DrawingGroup>
                     <GeometryDrawing Brush="#1C1C1C">
                         <GeometryDrawing.Geometry>
-                            <EllipseGeometry Center="1,1" RadiusX="0.6" RadiusY="0.6"/>
+                            <EllipseGeometry Center="3,3" RadiusX="0.6" RadiusY="0.6"/>
                         </GeometryDrawing.Geometry>
                     </GeometryDrawing>
                 </DrawingGroup>

@@ -20,8 +20,11 @@ namespace BMS.Overlay
         private readonly SettingsService _settingsService;
         private readonly NotepadService _notepadService;
         private readonly SharedNotepadService _sharedNotepadService;
+        private readonly MapDataService _mapDataService;
         private MainViewModel? _viewModel;
         private NotepadWindow? _notepadWindow;
+        private ObjectivesWindow? _objectivesWindow;
+        private MapWindow? _mapWindow;
 
         private const string ApiBaseUrl = "https://bms-production-f22e.up.railway.app/api/v1";
         private const double MinimizedHeight = 44;
@@ -47,6 +50,7 @@ namespace BMS.Overlay
             _settingsService = new SettingsService();
             _notepadService = new NotepadService();
             _sharedNotepadService = new SharedNotepadService(ApiBaseUrl);
+            _mapDataService = new MapDataService();
 
             // Set window properties — position below the Roblox game nav bar
             ApplyPosition();
@@ -111,6 +115,23 @@ namespace BMS.Overlay
                         return true;
                 }
 
+                // Check if the objectives window is foreground
+                if (_objectivesWindow != null && _objectivesWindow.IsLoaded)
+                {
+                    var objHandle = new WindowInteropHelper(_objectivesWindow).Handle;
+                    if (objHandle != IntPtr.Zero && fgWindow == objHandle)
+                        return true;
+                }
+
+                // Check if the map window is foreground
+                if (_mapWindow != null && _mapWindow.IsLoaded)
+                {
+                    var mapHandle = new WindowInteropHelper(_mapWindow).Handle;
+                    if (mapHandle != IntPtr.Zero && fgWindow == mapHandle)
+                        return true;
+                }
+
+
                 GetWindowThreadProcessId(fgWindow, out uint processId);
                 if (processId == 0) return false;
 
@@ -136,10 +157,11 @@ namespace BMS.Overlay
 
         private void UpdateOverlayVisibility()
         {
-            // Only show when: Roblox is foreground AND user hasn't pressed M to hide
+            bool mainShouldShow = _robloxIsForeground && !_isHiddenByUser;
+
             // Use Opacity instead of Visibility so the window handle stays alive
             // for global hotkey processing (WM_HOTKEY requires a valid HWND)
-            if (_robloxIsForeground && !_isHiddenByUser)
+            if (mainShouldShow)
             {
                 if (Opacity < 1.0)
                 {
@@ -164,7 +186,12 @@ namespace BMS.Overlay
             {
                 _notepadWindow.SetRobloxVisible(_robloxIsForeground && !_isHiddenByUser);
             }
-        }
+
+            // Sync objectives window
+            if (_objectivesWindow != null && _objectivesWindow.IsLoaded)
+            {
+                _objectivesWindow.SetRobloxVisible(_robloxIsForeground && !_isHiddenByUser);
+            }        }
 
         /// <summary>
         /// Makes the window non-interactive (click-through) or interactive.
@@ -272,6 +299,12 @@ namespace BMS.Overlay
 
                 // Start Roblox foreground detection
                 StartRobloxDetection();
+
+                // Create and show the persistent ObjectivesWindow
+                _objectivesWindow = new ObjectivesWindow(_viewModel);
+                _objectivesWindow.Closed += (_, _) => _objectivesWindow = null;
+                RepositionObjectivesWindowInternal(settings);
+                _objectivesWindow.Show();
 
                 // Initialize UI
                 try
@@ -453,6 +486,71 @@ namespace BMS.Overlay
             }
         }
 
+        private void OnMap_Click(object sender, RoutedEventArgs e)
+        {
+            if (_mapWindow == null || !_mapWindow.IsLoaded)
+            {
+                var screenW = SystemParameters.PrimaryScreenWidth;
+                var screenH = SystemParameters.PrimaryScreenHeight;
+                var s = _settingsService.GetSettings();
+                _mapWindow = new MapWindow(_mapDataService, _apiService, _viewModel!, _signalRService)
+                {
+                    Left   = s.MapLeft   * screenW,
+                    Top    = s.MapTop    * screenH,
+                    Width  = s.MapWidth  * screenW,
+                    Height = s.MapHeight * screenH
+                };
+                _mapWindow.Closed += (_, _) =>
+                {
+                    _mapWindow = null;
+                    MapButton.Content = "🗺";
+                };
+                _mapWindow.Show();
+                MapButton.Content = "🗺●";
+            }
+            else
+            {
+                if (_mapWindow.IsVisible)
+                    _mapWindow.ToggleDrawMode(); // 🗺● click cycles draw mode on/off
+                else
+                {
+                    _mapWindow.Show();
+                    _mapWindow.Activate();
+                    MapButton.Content = "🗺●";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called by MainViewModel when map region settings change — repositions the open MapWindow if any.
+        /// </summary>
+        public void RepositionMapWindow()
+        {
+            if (_mapWindow == null || !_mapWindow.IsLoaded) return;
+            var screenW = SystemParameters.PrimaryScreenWidth;
+            var screenH = SystemParameters.PrimaryScreenHeight;
+            var s = _settingsService.GetSettings();
+            _mapWindow.Left   = s.MapLeft   * screenW;
+            _mapWindow.Top    = s.MapTop    * screenH;
+            _mapWindow.Width  = s.MapWidth  * screenW;
+            _mapWindow.Height = s.MapHeight * screenH;
+        }
+
+        /// <summary>
+        /// Called by MainViewModel when the user changes ObjectivesPosition in Options.
+        /// </summary>
+        public void RepositionObjectivesWindow()
+        {
+            if (_objectivesWindow == null) return;
+            var settings = _settingsService.GetSettings();
+            RepositionObjectivesWindowInternal(settings);
+        }
+
+        private void RepositionObjectivesWindowInternal(Settings settings)
+        {
+            _objectivesWindow?.ApplyPosition(settings.ObjectivesPosition, Top, settings.OverlayWidth);
+        }
+
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _robloxCheckTimer?.Stop();
@@ -465,6 +563,18 @@ namespace BMS.Overlay
             if (_notepadWindow != null && _notepadWindow.IsLoaded)
             {
                 _notepadWindow.Close();
+            }
+
+            // Close objectives window
+            if (_objectivesWindow != null && _objectivesWindow.IsLoaded)
+            {
+                _objectivesWindow.Close();
+            }
+
+            // Close map window
+            if (_mapWindow != null && _mapWindow.IsLoaded)
+            {
+                _mapWindow.Close();
             }
 
             await _signalRService.DisposeAsync();

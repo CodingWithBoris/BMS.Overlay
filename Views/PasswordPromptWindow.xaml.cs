@@ -20,6 +20,12 @@ namespace BMS.Overlay.Views
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             Password = _isPasswordVisible ? PlainTextPasswordBox.Text : PasswordBox.Password;
+            if (string.IsNullOrWhiteSpace(Password))
+            {
+                MessageBox.Show("Please enter a password.", "Missing Password",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             DialogResult = true;
             Close();
         }

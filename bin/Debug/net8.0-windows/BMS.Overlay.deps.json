@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "BMS.Overlay/1.0.0": {
+      "BMS.Overlay/1.2.0": {
         "dependencies": {
           "BMS.Shared": "1.0.0",
           "Microsoft.AspNetCore.SignalR.Client": "8.0.11"
@@ -190,7 +190,7 @@
     }
   },
   "libraries": {
-    "BMS.Overlay/1.0.0": {
+    "BMS.Overlay/1.2.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -27,7 +27,9 @@ namespace BMS.Overlay.ViewModels
         public ObservableCollection<FactionInfo> Factions { get; } = new();
         public ObservableCollection<BmsOrder> Orders { get; } = new();
         public ObservableCollection<RoleInfo> Roles { get; } = new();
+        public ObservableCollection<VcMemberDto> VcRosterMembers { get; } = new();
         public string CurrentVoterId => _apiService.VoterId;
+        public string ApiBaseUrl => _apiService.BaseUrl;
         public HashSet<string> AuthenticatedFactionIds { get; } = new();
 
         public MainViewModel(ApiService apiService, SettingsService settingsService, SignalRService? signalRService = null)
@@ -40,6 +42,7 @@ namespace BMS.Overlay.ViewModels
             if (_signalRService != null)
             {
                 _signalRService.OnOrdersUpdated += OnOrdersUpdatedFromSignalR;
+                _signalRService.OnVcRosterUpdated += OnVcRosterUpdatedFromSignalR;
             }
         }
 
@@ -67,6 +70,32 @@ namespace BMS.Overlay.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error handling SignalR update: {ex.Message}");
+            }
+        }
+
+        private async void OnVcRosterUpdatedFromSignalR(string factionId, string action, System.Text.Json.JsonElement data)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"SignalR event: VcRosterUpdated for faction={factionId}, action={action}");
+
+                // Only refresh if we're viewing the same faction
+                if (string.IsNullOrEmpty(SelectedFactionId) ||
+                    (!string.IsNullOrEmpty(factionId) && factionId != SelectedFactionId))
+                {
+                    return;
+                }
+
+                // Refresh VC roster from server
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    await LoadVcRosterAsync();
+                    System.Diagnostics.Debug.WriteLine($"VC roster refreshed via SignalR (action={action})");
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error handling VC roster SignalR update: {ex.Message}");
             }
         }
 
@@ -222,6 +251,41 @@ namespace BMS.Overlay.ViewModels
             UpdateCurrentOrder();
         }
 
+        public async Task LoadVcRosterAsync()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(SelectedFactionId))
+                {
+                    VcRosterMembers.Clear();
+                    return;
+                }
+
+                var rosters = await _apiService.GetVcRosterFullAsync(SelectedFactionId);
+                var allMembers = new List<VcMemberDto>();
+
+                foreach (var roster in rosters)
+                {
+                    allMembers.AddRange(roster.Members);
+                }
+
+                // Filter out hidden members
+                var visibleMembers = allMembers.Where(m => !m.IsHidden).ToList();
+
+                VcRosterMembers.Clear();
+                foreach (var member in visibleMembers.OrderBy(m => m.Team).ThenBy(m => m.DisplayName))
+                {
+                    VcRosterMembers.Add(member);
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Loaded {VcRosterMembers.Count} members to overlay (hidden {allMembers.Count - VcRosterMembers.Count})");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading VC roster: {ex.Message}");
+            }
+        }
+
         public async Task SelectFactionAsync(FactionInfo faction)
         {
             System.Diagnostics.Debug.WriteLine($"SelectFactionAsync called: {faction.Title} (ID: {faction.Id})");
@@ -253,6 +317,7 @@ namespace BMS.Overlay.ViewModels
             _isPopulatingRoles = false;
             OnPropertyChanged(nameof(Roles));
             await LoadOrdersAsync();
+            await LoadVcRosterAsync();
 
             // Subscribe to real-time updates for this faction
             if (_signalRService != null)
@@ -260,6 +325,9 @@ namespace BMS.Overlay.ViewModels
                 await _signalRService.SubscribeToFactionAsync(faction.Id);
             }
         }
+
+        public Task<bool> VerifyFactionPasswordAsync(string factionId, string password)
+            => _apiService.VerifyFactionPasswordAsync(factionId, password);
 
         public void NextOrder()
         {
@@ -297,6 +365,26 @@ namespace BMS.Overlay.ViewModels
             {
                 CurrentOrder = null;
             }
+            OnPropertyChanged(nameof(CurrentObjectives));
+        }
+
+        public List<MissionObjective> CurrentObjectives => CurrentOrder?.Objectives ?? new();
+
+        public async Task ToggleObjectiveAsync(string objectiveId)
+        {
+            if (string.IsNullOrEmpty(SelectedFactionId) || CurrentOrder == null) return;
+            var orderId = CurrentOrder.Id;
+
+            // Optimistic update
+            var objective = CurrentOrder.Objectives?.FirstOrDefault(o => o.Id == objectiveId);
+            if (objective != null)
+            {
+                objective.IsChecked = !objective.IsChecked;
+                OnPropertyChanged(nameof(CurrentObjectives));
+            }
+
+            await _apiService.ToggleObjectiveAsync(SelectedFactionId, orderId, objectiveId);
+            // SignalR will trigger a full refresh via OrdersUpdated event
         }
 
         // ──────────────────────────────────────────
@@ -305,6 +393,58 @@ namespace BMS.Overlay.ViewModels
         public Settings GetSettings() => _settingsService.GetSettings();
 
         public double ContentFontSize => _settingsService.GetSettings().OverlayFontSize;
+
+        public string FilterUsername(string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(displayName))
+                return displayName;
+
+            var settings = _settingsService.GetSettings();
+            if (!settings.FilterUsernames)
+                return displayName;
+
+            var filtered = displayName;
+
+            // Remove prefix if set
+            if (!string.IsNullOrEmpty(settings.UsernameFilterPrefix))
+            {
+                // Check if this is a separator-based filter (e.g., "remove before ' | '")
+                if (settings.UsernameFilterPrefix.StartsWith("__SEPARATOR__", StringComparison.Ordinal))
+                {
+                    var separator = settings.UsernameFilterPrefix.Substring("__SEPARATOR__".Length);
+                    var separatorIndex = filtered.IndexOf(separator, StringComparison.Ordinal);
+                    if (separatorIndex >= 0)
+                    {
+                        filtered = filtered.Substring(separatorIndex + separator.Length);
+                    }
+                }
+                else if (filtered.StartsWith(settings.UsernameFilterPrefix, StringComparison.Ordinal))
+                {
+                    filtered = filtered.Substring(settings.UsernameFilterPrefix.Length);
+                }
+            }
+
+            // Remove suffix if set
+            if (!string.IsNullOrEmpty(settings.UsernameFilterSuffix))
+            {
+                // Check if this is a separator-based filter (e.g., "remove after ' - '")
+                if (settings.UsernameFilterSuffix.StartsWith("__SEPARATOR__", StringComparison.Ordinal))
+                {
+                    var separator = settings.UsernameFilterSuffix.Substring("__SEPARATOR__".Length);
+                    var separatorIndex = filtered.IndexOf(separator, StringComparison.Ordinal);
+                    if (separatorIndex >= 0)
+                    {
+                        filtered = filtered.Substring(0, separatorIndex);
+                    }
+                }
+                else if (filtered.EndsWith(settings.UsernameFilterSuffix, StringComparison.Ordinal))
+                {
+                    filtered = filtered.Substring(0, filtered.Length - settings.UsernameFilterSuffix.Length);
+                }
+            }
+
+            return filtered.Trim();
+        }
 
         public void UpdateToggleKey(string keyName)
         {
@@ -379,6 +519,79 @@ namespace BMS.Overlay.ViewModels
             if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
             {
                 mainWindow.SetJtacMode(enabled);
+            }
+        }
+
+        public void UpdateObjectivesPosition(string position)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.ObjectivesPosition = position;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.RepositionObjectivesWindow();
+            }
+        }
+
+        public void UpdateVcRosterDisplayMode(string mode)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.VcRosterDisplayMode = mode;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            // Trigger a re-render by raising a property changed on CurrentOrder
+            OnPropertyChanged(nameof(CurrentOrder));
+        }
+
+        public void UpdateUsernameFilterEnabled(bool enabled)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.FilterUsernames = enabled;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            // Trigger a re-render to apply filter changes
+            OnPropertyChanged(nameof(CurrentOrder));
+        }
+
+        public void UpdateUsernameFilterPrefix(string prefix)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.UsernameFilterPrefix = prefix;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            // Trigger a re-render to apply filter changes
+            OnPropertyChanged(nameof(CurrentOrder));
+        }
+
+        public void UpdateUsernameFilterSuffix(string suffix)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.UsernameFilterSuffix = suffix;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            // Trigger a re-render to apply filter changes
+            OnPropertyChanged(nameof(CurrentOrder));
+        }
+
+        public void UpdateMapRegion(double left, double top, double width, double height)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.MapLeft   = left;
+            settings.MapTop    = top;
+            settings.MapWidth  = width;
+            settings.MapHeight = height;
+            _settingsService.UpdateSettings(settings);
+            _ = _settingsService.SaveAsync();
+
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                mainWindow.RepositionMapWindow();
             }
         }
     }

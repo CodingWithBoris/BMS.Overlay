@@ -3677,13 +3677,13 @@
     "C:\\Users\\bramw\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.2.0",
     "restore": {
-      "projectUniqueName": "C:\\GIT\\Private Projects\\bms\\bms.overlay\\BMS.Overlay.csproj",
+      "projectUniqueName": "C:\\GIT\\Private Projects\\BMS\\BMS.Overlay\\BMS.Overlay.csproj",
       "projectName": "BMS.Overlay",
-      "projectPath": "C:\\GIT\\Private Projects\\bms\\bms.overlay\\BMS.Overlay.csproj",
+      "projectPath": "C:\\GIT\\Private Projects\\BMS\\BMS.Overlay\\BMS.Overlay.csproj",
       "packagesPath": "C:\\Users\\bramw\\.nuget\\packages\\",
-      "outputPath": "C:\\GIT\\Private Projects\\bms\\bms.overlay\\obj\\",
+      "outputPath": "C:\\GIT\\Private Projects\\BMS\\BMS.Overlay\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\bramw\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -3698,8 +3698,8 @@
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
           "projectReferences": {
-            "C:\\GIT\\Private Projects\\bms\\BMS.Shared\\BMS.Shared.csproj": {
-              "projectPath": "C:\\GIT\\Private Projects\\bms\\BMS.Shared\\BMS.Shared.csproj"
+            "C:\\GIT\\Private Projects\\BMS\\BMS.Shared\\BMS.Shared.csproj": {
+              "projectPath": "C:\\GIT\\Private Projects\\BMS\\BMS.Shared\\BMS.Shared.csproj"
             }
           }
         }

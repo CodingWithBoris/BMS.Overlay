@@ -8,6 +8,7 @@
         Background="Transparent"
         Topmost="True" ShowInTaskbar="False"
         ResizeMode="CanResizeWithGrip"
+        Icon="/app.ico"
         Closing="Window_Closing">
 
     <Window.Resources>

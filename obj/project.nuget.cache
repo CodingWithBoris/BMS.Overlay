@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "UOtudiziNOE=",
+  "dgSpecHash": "Wlu7DJPBeRo=",
   "success": true,
-  "projectFilePath": "C:\\GIT\\Private Projects\\bms\\bms.overlay\\BMS.Overlay.csproj",
+  "projectFilePath": "C:\\GIT\\Private Projects\\BMS\\BMS.Overlay\\BMS.Overlay.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\bramw\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\8.0.11\\microsoft.aspnetcore.connections.abstractions.8.0.11.nupkg.sha512",
     "C:\\Users\\bramw\\.nuget\\packages\\microsoft.aspnetcore.http.connections.client\\8.0.11\\microsoft.aspnetcore.http.connections.client.8.0.11.nupkg.sha512",

@@ -1,5 +1,5 @@
 ﻿BMS.Overlay
-1.0.0.0
+1.2.0.0
 
 winexe
 C#
@@ -10,11 +10,11 @@ none
 false
 TRACE;RELEASE;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\GIT\Private Projects\BMS\BMS.Overlay\App.xaml
-5-95132307
+7462960450
 
-161865004481
+19595879359
 214-1935081015
-MainWindow.xaml;Views\BmsOptionsView.xaml;Views\BmsTabView.xaml;Views\NotepadWindow.xaml;Views\PasswordPromptWindow.xaml;
+MainWindow.xaml;Views\BmsOptionsView.xaml;Views\BmsTabView.xaml;Views\MapWindow.xaml;Views\NotepadWindow.xaml;Views\ObjectivesWindow.xaml;Views\PasswordPromptWindow.xaml;
 
 False
 

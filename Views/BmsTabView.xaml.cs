@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,13 +22,23 @@ namespace BMS.Overlay.Views
         private void BmsTabView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue is MainViewModel oldVm)
+            {
                 oldVm.PropertyChanged -= ViewModel_PropertyChanged;
+                oldVm.VcRosterMembers.CollectionChanged -= VcRosterMembers_CollectionChanged;
+            }
 
             if (e.NewValue is MainViewModel newVm)
             {
                 newVm.PropertyChanged += ViewModel_PropertyChanged;
+                newVm.VcRosterMembers.CollectionChanged += VcRosterMembers_CollectionChanged;
                 RenderOrder(newVm.CurrentOrder);
             }
+        }
+
+        private void VcRosterMembers_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            var vm = DataContext as MainViewModel;
+            Dispatcher.Invoke(() => RenderOrder(vm?.CurrentOrder));
         }
 
         private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -133,9 +144,208 @@ namespace BMS.Overlay.Views
                 case "checklist":
                     RenderChecklistSection(container, section, order, fontSize);
                     break;
+                case "vcroster":
+                    RenderVcRosterSection(container, fontSize);
+                    break;
             }
 
             SectionsPanel.Children.Add(container);
+        }
+
+        private void RenderVcRosterSection(StackPanel parent, double fontSize)
+        {
+            var vm = DataContext as MainViewModel;
+            if (vm == null) return;
+
+            var settings = vm.GetSettings();
+            var displayMode = settings?.VcRosterDisplayMode ?? "compact";
+
+            if (displayMode == "detailed")
+            {
+                RenderVcRosterDetailed(parent, fontSize, vm);
+            }
+            else
+            {
+                RenderVcRosterCompact(parent, fontSize, vm);
+            }
+        }
+
+        private void RenderVcRosterCompact(StackPanel parent, double fontSize, MainViewModel vm)
+        {
+            var border = new Border
+            {
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A)),
+                BorderThickness = new Thickness(1),
+                Background = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A)),
+                Padding = new Thickness(10),
+            };
+
+            var stack = new StackPanel();
+            border.Child = stack;
+
+            stack.Children.Add(new TextBlock
+            {
+                Text = "Team callsign role name",
+                FontSize = Math.Max(10, fontSize - 2),
+                Foreground = new SolidColorBrush(Color.FromRgb(0xA0, 0xA0, 0xA0)),
+                Margin = new Thickness(0, 0, 0, 6),
+            });
+
+            if (vm.VcRosterMembers.Count == 0)
+            {
+                stack.Children.Add(new TextBlock
+                {
+                    Text = "No VC members currently online.",
+                    FontSize = fontSize - 1,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)),
+                });
+
+                parent.Children.Add(border);
+                return;
+            }
+
+            var autoCallsign = 1;
+            foreach (var member in vm.VcRosterMembers
+                         .OrderBy(m => string.IsNullOrWhiteSpace(m.Team) ? "zzzz" : m.Team)
+                         .ThenBy(m => m.DisplayName))
+            {
+                var team = string.IsNullOrWhiteSpace(member.Team) ? "Unassigned" : member.Team.Trim();
+                var callsign = string.IsNullOrWhiteSpace(member.Callsign)
+                    ? $"{autoCallsign:00}"
+                    : member.Callsign.Trim();
+                if (string.IsNullOrWhiteSpace(member.Callsign)) autoCallsign++;
+
+                var role = string.IsNullOrWhiteSpace(member.Role) ? "-" : member.Role.Trim();
+                var rawName = string.IsNullOrWhiteSpace(member.DisplayName) ? "Unknown" : member.DisplayName.Trim();
+                var name = vm.FilterUsername(rawName);
+
+                stack.Children.Add(new TextBlock
+                {
+                    Text = $"{team} - {callsign} {role} {name}",
+                    FontSize = Math.Max(11, fontSize - 1),
+                    Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8)),
+                    Margin = new Thickness(0, 0, 0, 2),
+                });
+            }
+
+            parent.Children.Add(border);
+        }
+
+        private void RenderVcRosterDetailed(StackPanel parent, double fontSize, MainViewModel vm)
+        {
+            if (vm.VcRosterMembers.Count == 0)
+            {
+                var emptyBorder = new Border
+                {
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2A)),
+                    BorderThickness = new Thickness(1),
+                    Background = new SolidColorBrush(Color.FromRgb(0x0A, 0x0A, 0x0A)),
+                    Padding = new Thickness(10),
+                };
+
+                emptyBorder.Child = new TextBlock
+                {
+                    Text = "No VC members currently online.",
+                    FontSize = fontSize - 1,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)),
+                };
+
+                parent.Children.Add(emptyBorder);
+                return;
+            }
+
+            var autoCallsign = 1;
+            foreach (var member in vm.VcRosterMembers
+                         .OrderBy(m => string.IsNullOrWhiteSpace(m.Team) ? "zzzz" : m.Team)
+                         .ThenBy(m => m.DisplayName))
+            {
+                var memberBorder = new Border
+                {
+                    Background = new SolidColorBrush(Color.FromRgb(0x0D, 0x0D, 0x0D)),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(0x1A, 0x1A, 0x1A)),
+                    BorderThickness = new Thickness(1),
+                    Padding = new Thickness(8),
+                    Margin = new Thickness(0, 0, 0, 4),
+                };
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                // Avatar
+                if (!string.IsNullOrWhiteSpace(member.AvatarUrl))
+                {
+                    try
+                    {
+                        var avatar = new Image
+                        {
+                            Source = new BitmapImage(new Uri(member.AvatarUrl)),
+                            Width = 24,
+                            Height = 24,
+                            Stretch = Stretch.UniformToFill,
+                            VerticalAlignment = VerticalAlignment.Center,
+                        };
+                        Grid.SetColumn(avatar, 0);
+                        grid.Children.Add(avatar);
+                    }
+                    catch
+                    {
+                        // If avatar fails to load, just skip it
+                    }
+                }
+
+                // Info StackPanel (Name and Team • Role)
+                var infoStack = new StackPanel
+                {
+                    Margin = new Thickness(8, 0, 8, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                Grid.SetColumn(infoStack, 1);
+
+                var rawName = string.IsNullOrWhiteSpace(member.DisplayName) ? "Unknown" : member.DisplayName.Trim();
+                var filteredName = vm.FilterUsername(rawName);
+                var nameText = new TextBlock
+                {
+                    Text = filteredName,
+                    FontSize = Math.Max(11, fontSize - 1),
+                    FontWeight = FontWeights.Bold,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8)),
+                };
+                infoStack.Children.Add(nameText);
+
+                var team = string.IsNullOrWhiteSpace(member.Team) ? "Unassigned" : member.Team.Trim();
+                var role = string.IsNullOrWhiteSpace(member.Role) ? "-" : member.Role.Trim();
+                var detailsText = new TextBlock
+                {
+                    Text = $"{team} • {role}",
+                    FontSize = Math.Max(9, fontSize - 3),
+                    Foreground = new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)),
+                };
+                infoStack.Children.Add(detailsText);
+
+                grid.Children.Add(infoStack);
+
+                // Callsign (right side)
+                var callsign = string.IsNullOrWhiteSpace(member.Callsign)
+                    ? $"{autoCallsign:00}"
+                    : member.Callsign.Trim();
+                if (string.IsNullOrWhiteSpace(member.Callsign)) autoCallsign++;
+
+                var callsignText = new TextBlock
+                {
+                    Text = callsign,
+                    FontSize = Math.Max(11, fontSize - 1),
+                    FontWeight = FontWeights.Bold,
+                    Foreground = new SolidColorBrush(Color.FromRgb(0xD8, 0xD8, 0xD8)),
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                Grid.SetColumn(callsignText, 2);
+                grid.Children.Add(callsignText);
+
+                memberBorder.Child = grid;
+                parent.Children.Add(memberBorder);
+            }
         }
 
         private void RenderTextSection(StackPanel parent, OrderSection section, double fontSize)
@@ -188,9 +398,10 @@ namespace BMS.Overlay.Views
 
             try
             {
+                var resolvedUrl = ResolveMediaUrl(section.ImageUrl);
                 var image = new Image
                 {
-                    Source = new BitmapImage(new Uri(section.ImageUrl, UriKind.Absolute)),
+                    Source = new BitmapImage(new Uri(resolvedUrl, UriKind.Absolute)),
                     Stretch = Stretch.Uniform,
                     MaxHeight = 300,
                     HorizontalAlignment = HorizontalAlignment.Left,
@@ -242,9 +453,10 @@ namespace BMS.Overlay.Views
         {
             try
             {
+                var resolvedUrl = ResolveMediaUrl(url);
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri(url, UriKind.Absolute);
+                bitmap.UriSource = new Uri(resolvedUrl, UriKind.Absolute);
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.EndInit();
 
@@ -284,6 +496,7 @@ namespace BMS.Overlay.Views
         {
             try
             {
+                var resolvedUrl = ResolveMediaUrl(url);
                 var mediaElement = new MediaElement
                 {
                     LoadedBehavior = MediaState.Manual,
@@ -334,7 +547,7 @@ namespace BMS.Overlay.Views
                     });
                 };
 
-                mediaElement.Source = new Uri(url, UriKind.Absolute);
+                mediaElement.Source = new Uri(resolvedUrl, UriKind.Absolute);
                 mediaElement.Play();
             }
             catch (Exception ex)
@@ -601,6 +814,22 @@ namespace BMS.Overlay.Views
             if (inline is Span span)
                 foreach (var child in span.Inlines)
                     ClearInlineFontSize(child);
+        }
+
+        private string ResolveMediaUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return url;
+            if (url.StartsWith("data:", StringComparison.OrdinalIgnoreCase)) return url;
+
+            if (Uri.TryCreate(url, UriKind.Absolute, out var absolute))
+                return absolute.ToString();
+
+            var vm = DataContext as MainViewModel;
+            if (vm == null || string.IsNullOrWhiteSpace(vm.ApiBaseUrl)) return url;
+
+            var baseUri = new Uri(vm.ApiBaseUrl, UriKind.Absolute);
+            var relative = url.StartsWith("/") ? url : "/" + url;
+            return new Uri(baseUri, relative).ToString();
         }
     }
 }

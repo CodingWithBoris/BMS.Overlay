@@ -251,7 +251,7 @@ namespace BMS.Overlay.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/BMS.Overlay;V1.0.0.0;component/views/notepadwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/BMS.Overlay;V1.2.0.0;component/views/notepadwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\..\Views\NotepadWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

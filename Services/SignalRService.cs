@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace BMS.Overlay.Services
 {
@@ -11,6 +12,8 @@ namespace BMS.Overlay.Services
 
         public event Action<string, string, string>? OnOrdersUpdated; // factionId, orderId, action
         public event Action<string, DateTime>? OnSharedNotepadUpdated; // rtfContent, updatedAt
+        public event Action<string, string, string, JsonElement>? OnMapUpdated; // factionId, orderId, action, data
+        public event Action<string, string, JsonElement>? OnVcRosterUpdated; // factionId, action, data
 
         public SignalRService(string baseApiUrl)
         {
@@ -65,6 +68,20 @@ namespace BMS.Overlay.Services
                         Debug.WriteLine($"SignalR: Error parsing SharedNotepadUpdated: {ex.Message}");
                     }
                 });
+
+                _connection.On<string, string, string, JsonElement>("MapUpdated",
+                    (factionId, orderId, action, data) =>
+                    {
+                        Debug.WriteLine($"SignalR: Received MapUpdated - faction={factionId}, order={orderId}, action={action}");
+                        OnMapUpdated?.Invoke(factionId, orderId, action, data);
+                    });
+
+                _connection.On<string, string, JsonElement>("VcRosterUpdated",
+                    (factionId, action, data) =>
+                    {
+                        Debug.WriteLine($"SignalR: Received VcRosterUpdated - faction={factionId}, action={action}");
+                        OnVcRosterUpdated?.Invoke(factionId, action, data);
+                    });
 
                 _connection.Reconnecting += (error) =>
                 {

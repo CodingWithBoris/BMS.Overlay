@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -60,8 +61,50 @@ namespace BMS.Overlay.Views
                     // Load current font size
                     FontSizeInput.Text = $"{settings.OverlayFontSize:0}";
 
+                    // Load map region (stored as 0.0–1.0, displayed as 0–100)
+                    MapLeftInput.Text   = $"{settings.MapLeft   * 100:0.##}";
+                    MapTopInput.Text    = $"{settings.MapTop    * 100:0.##}";
+                    MapWidthInput.Text  = $"{settings.MapWidth  * 100:0.##}";
+                    MapHeightInput.Text = $"{settings.MapHeight * 100:0.##}";
+
                     // Load JTAC mode
                     ApplyJtacVisuals(settings.JtacMode);
+
+                    // Load VC Roster display mode
+                    ApplyVcRosterDisplayVisuals(settings.VcRosterDisplayMode);
+
+                    // Load username filter settings
+                    FilterUsernamesCheckBox.IsChecked = settings.FilterUsernames;
+                    
+                    // Select the appropriate prefix combo item
+                    foreach (ComboBoxItem item in UsernameFilterPrefixCombo.Items)
+                    {
+                        if (item.Tag?.ToString() == settings.UsernameFilterPrefix)
+                        {
+                            UsernameFilterPrefixCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
+                    
+                    // Select the appropriate suffix combo item
+                    foreach (ComboBoxItem item in UsernameFilterSuffixCombo.Items)
+                    {
+                        if (item.Tag?.ToString() == settings.UsernameFilterSuffix)
+                        {
+                            UsernameFilterSuffixCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
+
+                    // Load objectives position
+                    foreach (ComboBoxItem item in ObjectivesPositionCombo.Items)
+                    {
+                        if (item.Tag?.ToString() == settings.ObjectivesPosition)
+                        {
+                            ObjectivesPositionCombo.SelectedItem = item;
+                            break;
+                        }
+                    }
 
                     // Cache factions and take control of ItemsSource for inline filtering
                     _allFactions = vm.Factions.ToList();
@@ -351,6 +394,51 @@ namespace BMS.Overlay.Views
             vm.UpdateJtacMode(false);
         }
 
+        private void ObjectivesPositionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+            if (sender is not ComboBox combo || combo.SelectedItem is not ComboBoxItem item) return;
+            var position = item.Tag?.ToString() ?? "TopLeft";
+            vm.UpdateObjectivesPosition(position);
+        }
+
+        private void VcRosterCompact_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+            ApplyVcRosterDisplayVisuals("compact");
+            vm.UpdateVcRosterDisplayMode("compact");
+        }
+
+        private void VcRosterDetailed_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+            ApplyVcRosterDisplayVisuals("detailed");
+            vm.UpdateVcRosterDisplayMode("detailed");
+        }
+
+        private void FilterUsernamesCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+            var isChecked = FilterUsernamesCheckBox.IsChecked ?? false;
+            vm.UpdateUsernameFilterEnabled(isChecked);
+        }
+
+        private void UsernameFilterPrefixCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+            if (sender is not ComboBox combo || combo.SelectedItem is not ComboBoxItem item) return;
+            var prefix = item.Tag?.ToString() ?? string.Empty;
+            vm.UpdateUsernameFilterPrefix(prefix);
+        }
+
+        private void UsernameFilterSuffixCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+            if (sender is not ComboBox combo || combo.SelectedItem is not ComboBoxItem item) return;
+            var suffix = item.Tag?.ToString() ?? string.Empty;
+            vm.UpdateUsernameFilterSuffix(suffix);
+        }
+
         private void ApplyJtacVisuals(bool jtacOn)
         {
             var activeBorder = new System.Windows.Media.SolidColorBrush(
@@ -373,6 +461,87 @@ namespace BMS.Overlay.Views
             JtacOffBorder.BorderBrush = !jtacOn ? activeBorder : dimBorder;
             JtacOffBorder.Background = !jtacOn ? activeBg : inactiveBg;
             JtacOffText.Foreground = !jtacOn ? activeText : dimText;
+        }
+
+        private void ApplyVcRosterDisplayVisuals(string mode)
+        {
+            var activeBorder = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#D4880A"));
+            var activeText = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFB300"));
+            var dimBorder = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#2A2A2A"));
+            var dimText = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#6A6A6A"));
+            var activeBg = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A0A0A"));
+            var inactiveBg = new System.Windows.Media.SolidColorBrush(
+                (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#0A0A0A"));
+
+            var isCompact = mode == "compact";
+
+            VcRosterCompactBorder.BorderBrush = isCompact ? activeBorder : dimBorder;
+            VcRosterCompactBorder.Background = isCompact ? activeBg : inactiveBg;
+            VcRosterCompactText.Foreground = isCompact ? activeText : dimText;
+
+            VcRosterDetailedBorder.BorderBrush = !isCompact ? activeBorder : dimBorder;
+            VcRosterDetailedBorder.Background = !isCompact ? activeBg : inactiveBg;
+            VcRosterDetailedText.Foreground = !isCompact ? activeText : dimText;
+        }
+
+        private void MapRegionInput_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            // Allow digits and one decimal point
+            var tb = (TextBox)sender;
+            var newText = tb.Text.Insert(tb.CaretIndex, e.Text);
+            e.Handled = !double.TryParse(newText, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out _);
+        }
+
+        private void MapRegionInput_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ApplyMapRegionFromInputs();
+                ((TextBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                e.Handled = true;
+            }
+        }
+
+        private void MapRegionInput_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ApplyMapRegionFromInputs();
+        }
+
+        private void ApplyMapRegionFromInputs()
+        {
+            if (_isInitializing || DataContext is not MainViewModel vm) return;
+
+            bool Parse(TextBox tb, out double result)
+            {
+                if (double.TryParse(tb.Text, System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.InvariantCulture, out result))
+                {
+                    result = Math.Clamp(result, 0, 100);
+                    tb.Text = $"{result:0.##}";
+                    return true;
+                }
+                return false;
+            }
+
+            if (!Parse(MapLeftInput, out var left) || !Parse(MapTopInput, out var top) ||
+                !Parse(MapWidthInput, out var width) || !Parse(MapHeightInput, out var height))
+            {
+                // Revert invalid fields to current settings
+                var s = vm.GetSettings();
+                MapLeftInput.Text   = $"{s.MapLeft   * 100:0.##}";
+                MapTopInput.Text    = $"{s.MapTop    * 100:0.##}";
+                MapWidthInput.Text  = $"{s.MapWidth  * 100:0.##}";
+                MapHeightInput.Text = $"{s.MapHeight * 100:0.##}";
+                return;
+            }
+
+            vm.UpdateMapRegion(left / 100.0, top / 100.0, width / 100.0, height / 100.0);
         }
 
         private void OnFactionComboTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -407,10 +576,7 @@ namespace BMS.Overlay.Views
                     System.Diagnostics.Debug.WriteLine($"Faction {faction.Title} already selected, skipping password prompt");
                     _lastAuthenticatedFactionId = faction.Id;
 
-                    if (vm.SelectedFactionId != faction.Id || vm.Roles.Count == 0)
-                    {
-                        await vm.SelectFactionAsync(faction);
-                    }
+                    await vm.SelectFactionAsync(faction);
 
                     return;
                 }
@@ -419,20 +585,35 @@ namespace BMS.Overlay.Views
                 var passwordWindow = new PasswordPromptWindow();
                 if (passwordWindow.ShowDialog() == true)
                 {
-                    await vm.SelectFactionAsync(faction);
-                    vm.AuthenticatedFactionIds.Add(faction.Id);
-                    _lastAuthenticatedFactionId = faction.Id;
-                }
-                else
-                {
-                    _isProgrammaticSelectionChange = true;
-                    if (!string.IsNullOrWhiteSpace(_lastAuthenticatedFactionId))
-                        FactionCombo.SelectedValue = _lastAuthenticatedFactionId;
+                    var password = passwordWindow.Password?.Trim() ?? string.Empty;
+                    if (string.IsNullOrWhiteSpace(password))
+                    {
+                        MessageBox.Show("Please enter the faction view password.", "Missing Password",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                     else
-                        FactionCombo.SelectedIndex = -1;
+                    {
+                        var ok = await vm.VerifyFactionPasswordAsync(faction.Id, password);
+                        if (ok)
+                        {
+                            await vm.SelectFactionAsync(faction);
+                            vm.AuthenticatedFactionIds.Add(faction.Id);
+                            _lastAuthenticatedFactionId = faction.Id;
+                            return;
+                        }
 
-                    _isProgrammaticSelectionChange = false;
+                        MessageBox.Show("Invalid faction view password.", "Access Denied",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
+
+                _isProgrammaticSelectionChange = true;
+                if (!string.IsNullOrWhiteSpace(_lastAuthenticatedFactionId))
+                    FactionCombo.SelectedValue = _lastAuthenticatedFactionId;
+                else
+                    FactionCombo.SelectedIndex = -1;
+
+                _isProgrammaticSelectionChange = false;
             }
         }
     }

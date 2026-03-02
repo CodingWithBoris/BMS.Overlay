@@ -1,11 +1,13 @@
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.exe
-C:\GIT\Private Projects\BMS\publish\Overlay\Templates\AfterActionReport.md
+C:\GIT\Private Projects\BMS\publish\Overlay\Templates\ECAS REQUEST.txt
 C:\GIT\Private Projects\BMS\publish\Overlay\Templates\EmergencyExvil.txt
+C:\GIT\Private Projects\BMS\publish\Overlay\Templates\EXFIL REQUEST 5-LINE.txt
 C:\GIT\Private Projects\BMS\publish\Overlay\Templates\HLZBrief.txt
-C:\GIT\Private Projects\BMS\publish\Overlay\Templates\OperationBrief.txt
+C:\GIT\Private Projects\BMS\publish\Overlay\Templates\MEDEVAC REQUEST.txt
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.dll
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.deps.json
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.runtimeconfig.json
+C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Overlay.pdb
 C:\GIT\Private Projects\BMS\publish\Overlay\Microsoft.AspNetCore.Connections.Abstractions.dll
 C:\GIT\Private Projects\BMS\publish\Overlay\Microsoft.AspNetCore.Http.Connections.Client.dll
 C:\GIT\Private Projects\BMS\publish\Overlay\Microsoft.AspNetCore.Http.Connections.Common.dll
@@ -22,3 +24,4 @@ C:\GIT\Private Projects\BMS\publish\Overlay\Microsoft.Extensions.Options.dll
 C:\GIT\Private Projects\BMS\publish\Overlay\Microsoft.Extensions.Primitives.dll
 C:\GIT\Private Projects\BMS\publish\Overlay\System.IO.Pipelines.dll
 C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Shared.dll
+C:\GIT\Private Projects\BMS\publish\Overlay\BMS.Shared.pdb

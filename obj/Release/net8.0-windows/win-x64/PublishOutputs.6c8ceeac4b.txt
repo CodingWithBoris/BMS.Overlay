@@ -1,0 +1,27 @@
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\BMS.Overlay.exe
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Templates\ECAS REQUEST.txt
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Templates\EmergencyExvil.txt
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Templates\EXFIL REQUEST 5-LINE.txt
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Templates\HLZBrief.txt
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Templates\MEDEVAC REQUEST.txt
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\BMS.Overlay.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\BMS.Overlay.deps.json
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\BMS.Overlay.runtimeconfig.json
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\BMS.Overlay.pdb
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.AspNetCore.SignalR.Client.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.AspNetCore.SignalR.Common.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.Extensions.DependencyInjection.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.Extensions.Features.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.Extensions.Logging.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.Extensions.Options.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\Microsoft.Extensions.Primitives.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\System.IO.Pipelines.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\BMS.Shared.dll
+C:\GIT\Private Projects\BMS\publish\BMS.Overlay-1.2.0\BMS.Shared.pdb

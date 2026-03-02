@@ -36,10 +36,21 @@ internal class BmsOrderDto
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public string? RoleId { get; set; }
+    public string? MapImageUrl { get; set; }
     public bool IsPublished { get; set; }
     public List<OrderSectionDto>? Sections { get; set; }
+    public List<MissionObjectiveDto>? Objectives { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+}
+
+internal class MissionObjectiveDto
+{
+    public string Id { get; set; } = string.Empty;
+    public int Index { get; set; }
+    public string Text { get; set; } = string.Empty;
+    public bool IsChecked { get; set; }
+    public string? CheckedBy { get; set; }
 }
 
 internal class OrderSectionDto
@@ -72,6 +83,57 @@ internal class ChecklistItemDto
     public string? CheckedBy { get; set; }
 }
 
+internal class MapPointDto
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+}
+
+internal class MapStrokeDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string Color { get; set; } = "#FF0000";
+    public double Size { get; set; } = 3;
+    public List<MapPointDto> Points { get; set; } = new();
+}
+
+internal class MapIconDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string IconType { get; set; } = "objective";
+    public double X { get; set; }
+    public double Y { get; set; }
+}
+
+internal class MapStateDto
+{
+    public string OrderId { get; set; } = string.Empty;
+    public List<MapStrokeDto> Strokes { get; set; } = new();
+    public List<MapIconDto> Icons { get; set; } = new();
+    public DateTime UpdatedAt { get; set; }
+}
+
+public class VcRosterDto
+{
+    public string FactionId { get; set; } = string.Empty;
+    public string ChannelId { get; set; } = string.Empty;
+    public string ChannelName { get; set; } = string.Empty;
+    public List<VcMemberDto> Members { get; set; } = new();
+    public DateTime UpdatedAt { get; set; }
+}
+
+public class VcMemberDto
+{
+    public string DiscordUserId { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string? AvatarUrl { get; set; }
+    public string? Team { get; set; }
+    public string? Callsign { get; set; }
+    public string? Role { get; set; }
+    public bool IsHidden { get; set; }
+    public DateTime JoinedVcAt { get; set; }
+}
+
 public class ApiService
 {
     private readonly HttpClient _httpClient;
@@ -84,7 +146,7 @@ public class ApiService
         // Allow override via constructor, otherwise use defaults
         // For local development: http://localhost:8080/api/v1
         // For production: https://bms-production-f22e.up.railway.app/api/v1
-        _baseUrl = (baseUrl ?? "http://localhost:8080/api/v1").TrimEnd('/');
+        _baseUrl = (baseUrl ?? "https://bms-production-f22e.up.railway.app/api/v1").TrimEnd('/');   
 
         var handler = new HttpClientHandler();
         // Disable SSL verification for testing (remove in production for security)
@@ -115,6 +177,7 @@ public class ApiService
     }
 
     public string VoterId => _voterId;
+    public string BaseUrl => _baseUrl;
 
     public async Task<List<BmsOrder>> GetOrdersAsync(string factionId)
     {
@@ -154,7 +217,16 @@ public class ApiService
                     Title = o.Title,
                     Content = o.Content,
                     RoleId = o.RoleId,
+                    MapImageUrl = o.MapImageUrl,
                     IsPublished = o.IsPublished,
+                    Objectives = o.Objectives?.Select(obj => new MissionObjective
+                    {
+                        Id = obj.Id,
+                        Index = obj.Index,
+                        Text = obj.Text,
+                        IsChecked = obj.IsChecked,
+                        CheckedBy = obj.CheckedBy,
+                    }).ToList() ?? new(),
                     Sections = o.Sections?.Select(s => new OrderSection
                     {
                         Id = s.Id,
@@ -384,6 +456,190 @@ public class ApiService
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[Overlay API] Toggle Checklist Error: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> ToggleObjectiveAsync(string factionId, string orderId, string objectiveId)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsync(
+                $"factions/{factionId}/orders/{orderId}/objectives/{objectiveId}/toggle",
+                new StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json"));
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Toggle Objective Error: {ex.Message}");
+            return false;
+        }
+    }
+
+    // ── Map Sync ──────────────────────────────────────────────────────────────
+
+    internal async Task<MapStateDto?> GetMapStateAsync(string factionId, string orderId)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"factions/{factionId}/orders/{orderId}/map");
+            if (!response.IsSuccessStatusCode) return null;
+            var json = await response.Content.ReadAsStringAsync();
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<MapStateDto>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return apiResponse?.Data;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] GetMapState Error: {ex.Message}");
+            return null;
+        }
+    }
+
+    internal async Task<MapStrokeDto?> AddMapStrokeAsync(string factionId, string orderId,
+        string color, double size, List<(double X, double Y)> points)
+    {
+        try
+        {
+            var body = new
+            {
+                color,
+                size,
+                points = points.Select(p => new { x = p.X, y = p.Y }).ToList()
+            };
+            var content = new StringContent(JsonSerializer.Serialize(body),
+                System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"factions/{factionId}/orders/{orderId}/map/strokes", content);
+            if (!response.IsSuccessStatusCode) return null;
+            var json = await response.Content.ReadAsStringAsync();
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<MapStrokeDto>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return apiResponse?.Data;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] AddMapStroke Error: {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<bool> DeleteMapStrokeAsync(string factionId, string orderId, string strokeId)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"factions/{factionId}/orders/{orderId}/map/strokes/{strokeId}");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] DeleteMapStroke Error: {ex.Message}");
+            return false;
+        }
+    }
+
+    internal async Task<MapIconDto?> AddMapIconAsync(string factionId, string orderId,
+        string iconType, double x, double y)
+    {
+        try
+        {
+            var body = new { iconType, x, y };
+            var content = new StringContent(JsonSerializer.Serialize(body),
+                System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"factions/{factionId}/orders/{orderId}/map/icons", content);
+            if (!response.IsSuccessStatusCode) return null;
+            var json = await response.Content.ReadAsStringAsync();
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<MapIconDto>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return apiResponse?.Data;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] AddMapIcon Error: {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<bool> MoveMapIconAsync(string factionId, string orderId, string iconId,
+        double x, double y)
+    {
+        try
+        {
+            var body = new { x, y };
+            var content = new StringContent(JsonSerializer.Serialize(body),
+                System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"factions/{factionId}/orders/{orderId}/map/icons/{iconId}", content);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] MoveMapIcon Error: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteMapIconAsync(string factionId, string orderId, string iconId)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"factions/{factionId}/orders/{orderId}/map/icons/{iconId}");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] DeleteMapIcon Error: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> ClearMapAsync(string factionId, string orderId)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"factions/{factionId}/orders/{orderId}/map");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] ClearMap Error: {ex.Message}");
+            return false;
+        }
+    }
+
+    // ── VC Roster ──────────────────────────────────────────────────────────────
+
+    public async Task<List<VcRosterDto>> GetVcRosterFullAsync(string factionId)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"factions/{factionId}/vc-roster/full");
+            if (!response.IsSuccessStatusCode) return new();
+            var json = await response.Content.ReadAsStringAsync();
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<VcRosterDto>>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return apiResponse?.Data ?? new();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] GetVcRosterFull Error: {ex.Message}");
+            return new();
+        }
+    }
+
+    public async Task<bool> VerifyOfficerPasswordAsync(string factionId, string password)
+    {
+        try
+        {
+            var request = new { password };
+            var content = new StringContent(
+                JsonSerializer.Serialize(request),
+                System.Text.Encoding.UTF8,
+                "application/json");
+            var response = await _httpClient.PostAsync($"factions/{factionId}/verify-officer", content);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Overlay API] Verify Officer Error: {ex.Message}");
             return false;
         }
     }

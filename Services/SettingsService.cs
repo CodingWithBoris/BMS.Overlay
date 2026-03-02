@@ -72,4 +72,19 @@ public class Settings
     public double OverlayFontSize { get; set; } = 12;
     public double OverlayOpacity { get; set; } = 0.8;
     public bool JtacMode { get; set; } = false;
+    public string ObjectivesPosition { get; set; } = "TopLeft"; // "TopLeft" | "TopRight"
+
+    // Map window region — fractions of screen (0.0–1.0). Defaults match previous hardcoded values.
+    public double MapLeft   { get; set; } = 0.0;
+    public double MapTop    { get; set; } = 0.15;
+    public double MapWidth  { get; set; } = 1.0;
+    public double MapHeight { get; set; } = 0.85;
+
+    // VC Roster display mode — "compact" (text only) | "detailed" (with avatars)
+    public string VcRosterDisplayMode { get; set; } = "compact";
+
+    // Username filtering — remove rank prefixes/suffixes from display names
+    public bool FilterUsernames { get; set; } = false;
+    public string UsernameFilterPrefix { get; set; } = string.Empty; // Text to remove from start of username
+    public string UsernameFilterSuffix { get; set; } = string.Empty; // Text to remove from end of username
 }

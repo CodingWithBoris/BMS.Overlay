@@ -293,7 +293,7 @@
                     </Grid>
                 </Border>
 
-                <Border Style="{StaticResource KeybindRowStyle}" Margin="0,0,0,16">
+                <Border Style="{StaticResource KeybindRowStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -316,6 +316,185 @@
                             </Border>
                         </StackPanel>
                     </Grid>
+                </Border>
+
+                <Border Style="{StaticResource KeybindRowAltStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="OBJECTIVES POSITION" Style="{StaticResource KeybindLabelStyle}"/>
+                            <TextBlock Text="CORNER FOR MISSION OBJECTIVES PANEL" Foreground="#6A6A6A" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <ComboBox x:Name="ObjectivesPositionCombo" Grid.Column="1" Width="110"
+                                  SelectionChanged="ObjectivesPositionCombo_SelectionChanged"
+                                  Background="#0A0A0A" Foreground="#D8D8D8" BorderBrush="#2A2A2A">
+                            <ComboBoxItem Content="Top Left" Tag="TopLeft"/>
+                            <ComboBoxItem Content="Top Right" Tag="TopRight"/>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource KeybindRowStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="VC ROSTER DISPLAY" Style="{StaticResource KeybindLabelStyle}"/>
+                            <TextBlock Text="COMPACT TEXT-ONLY OR DETAILED WITH AVATARS" Foreground="#6A6A6A" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border x:Name="VcRosterCompactBorder" BorderThickness="1" Cursor="Hand"
+                                    MouseLeftButtonUp="VcRosterCompact_Click">
+                                <TextBlock x:Name="VcRosterCompactText" Text="COMPACT" FontWeight="Bold" FontSize="12"
+                                           Padding="12,5" HorizontalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="VcRosterDetailedBorder" BorderThickness="1" Margin="0,0,2,0" Cursor="Hand"
+                                    MouseLeftButtonUp="VcRosterDetailed_Click">
+                                <TextBlock x:Name="VcRosterDetailedText" Text="DETAILED" FontWeight="Bold" FontSize="12"
+                                           Padding="12,5" HorizontalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource KeybindRowAltStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="FILTER USERNAMES" Style="{StaticResource KeybindLabelStyle}"/>
+                            <TextBlock Text="REMOVE RANK PREFIXES/SUFFIXES FROM DISPLAY NAMES" Foreground="#6A6A6A" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <CheckBox x:Name="FilterUsernamesCheckBox" Grid.Column="1" 
+                                  VerticalAlignment="Center"
+                                  Checked="FilterUsernamesCheckBox_Changed"
+                                  Unchecked="FilterUsernamesCheckBox_Changed"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource KeybindRowStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="USERNAME FILTER PREFIX" Style="{StaticResource KeybindLabelStyle}"/>
+                            <TextBlock Text="SELECT RANK FORMAT TO REMOVE FROM START OF NAME" Foreground="#6A6A6A" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <ComboBox x:Name="UsernameFilterPrefixCombo" Grid.Column="1" Width="170"
+                                  SelectionChanged="UsernameFilterPrefixCombo_SelectionChanged"
+                                  Background="#0A0A0A" Foreground="#D8D8D8" BorderBrush="#2A2A2A">
+                            <ComboBoxItem Content="Disabled" Tag=""/>
+                            <ComboBoxItem Content="Remove before ' | '" Tag="__SEPARATOR__| "/>
+                            <ComboBoxItem Content="Remove before ' - '" Tag="__SEPARATOR__- "/>
+                            <ComboBoxItem Content="Remove before ') '" Tag="__SEPARATOR__) "/>
+                            <ComboBoxItem Content="Remove before '] '" Tag="__SEPARATOR__] "/>
+                            <ComboBoxItem Content="Remove before '} '" Tag="__SEPARATOR__} "/>
+                            <ComboBoxItem Content="Remove before ')'  (at end)" Tag="__SEPARATOR__)"/>
+                            <ComboBoxItem Content="Remove before ']'  (at end)" Tag="__SEPARATOR__]"/>
+                            <ComboBoxItem Content="Remove before '}'  (at end)" Tag="__SEPARATOR__}"/>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource KeybindRowAltStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="USERNAME FILTER SUFFIX" Style="{StaticResource KeybindLabelStyle}"/>
+                            <TextBlock Text="SELECT RANK FORMAT TO REMOVE FROM END OF NAME" Foreground="#6A6A6A" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <ComboBox x:Name="UsernameFilterSuffixCombo" Grid.Column="1" Width="170"
+                                  SelectionChanged="UsernameFilterSuffixCombo_SelectionChanged"
+                                  Background="#0A0A0A" Foreground="#D8D8D8" BorderBrush="#2A2A2A">
+                            <ComboBoxItem Content="Disabled" Tag=""/>
+                            <ComboBoxItem Content="Remove after ' | '" Tag="__SEPARATOR__| "/>
+                            <ComboBoxItem Content="Remove after ' - '" Tag="__SEPARATOR__- "/>
+                            <ComboBoxItem Content="Remove after ' ('" Tag="__SEPARATOR__ ("/>
+                            <ComboBoxItem Content="Remove after ' ['" Tag="__SEPARATOR__ ["/>
+                            <ComboBoxItem Content="Remove after ' {'" Tag="__SEPARATOR__ {"/>
+                            <ComboBoxItem Content="Remove after '(' (at end)" Tag="__SEPARATOR__("/>
+                            <ComboBoxItem Content="Remove after '[' (at end)" Tag="__SEPARATOR__["/>
+                            <ComboBoxItem Content="Remove after '{' (at end)" Tag="__SEPARATOR__{"/>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+
+                <!-- MAP REGION section -->
+                <DockPanel Margin="0,0,0,6">
+                    <TextBlock Text="MAP REGION" Style="{StaticResource GameSectionTitleStyle}"/>
+                    <Border Style="{StaticResource GameSectionLineStyle}"/>
+                </DockPanel>
+
+                <Border Style="{StaticResource KeybindRowStyle}">
+                    <StackPanel>
+                        <TextBlock Text="ALIGN OVERLAY TO IN-GAME MAP" Style="{StaticResource KeybindLabelStyle}" Margin="0,0,0,2"/>
+                        <TextBlock Text="SET TO MATCH WHERE THE MAP APPEARS ON SCREEN (0–100%)" Foreground="#6A6A6A" FontSize="10" Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Left" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBox x:Name="MapLeftInput" Grid.Column="1"
+                                     Style="{StaticResource ReadableTextBox}" MinWidth="0"
+                                     TextAlignment="Center" FontSize="11"
+                                     PreviewTextInput="MapRegionInput_PreviewTextInput"
+                                     LostFocus="MapRegionInput_LostFocus"
+                                     PreviewKeyDown="MapRegionInput_PreviewKeyDown"/>
+                            <TextBlock Grid.Column="2" Text="%" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="2,0,8,0"/>
+                            <TextBlock Grid.Column="3" Text="Top" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBox x:Name="MapTopInput" Grid.Column="4"
+                                     Style="{StaticResource ReadableTextBox}" MinWidth="0"
+                                     TextAlignment="Center" FontSize="11"
+                                     PreviewTextInput="MapRegionInput_PreviewTextInput"
+                                     LostFocus="MapRegionInput_LostFocus"
+                                     PreviewKeyDown="MapRegionInput_PreviewKeyDown"/>
+                            <TextBlock Grid.Column="5" Text="%" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="2,0,8,0"/>
+                            <TextBlock Grid.Column="6" Text="Width" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBox x:Name="MapWidthInput" Grid.Column="7"
+                                     Style="{StaticResource ReadableTextBox}" MinWidth="0"
+                                     TextAlignment="Center" FontSize="11"
+                                     PreviewTextInput="MapRegionInput_PreviewTextInput"
+                                     LostFocus="MapRegionInput_LostFocus"
+                                     PreviewKeyDown="MapRegionInput_PreviewKeyDown"/>
+                            <TextBlock Grid.Column="8" Text="%" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="2,0,8,0"/>
+                            <TextBlock Grid.Column="9" Text="Height" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                            <TextBox x:Name="MapHeightInput" Grid.Column="10"
+                                     Style="{StaticResource ReadableTextBox}" MinWidth="0"
+                                     TextAlignment="Center" FontSize="11"
+                                     PreviewTextInput="MapRegionInput_PreviewTextInput"
+                                     LostFocus="MapRegionInput_LostFocus"
+                                     PreviewKeyDown="MapRegionInput_PreviewKeyDown"/>
+                            <TextBlock Grid.Column="11" Text="%" Foreground="#A0A0A0" FontSize="11" VerticalAlignment="Center" Margin="2,0,0,0"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource KeybindRowAltStyle}" Margin="0,0,0,16">
+                    <TextBlock FontSize="10" Foreground="#6A6A6A" TextWrapping="Wrap"
+                               Text="EXAMPLE: LEFT=5 TOP=10 WIDTH=90 HEIGHT=80 MEANS THE MAP WINDOW COVERS FROM 5% TO 95% HORIZONTALLY AND 10% TO 90% VERTICALLY. CHANGES TAKE EFFECT IMMEDIATELY IF MAP IS OPEN."/>
                 </Border>
 
                 <DockPanel Margin="0,0,0,6">
